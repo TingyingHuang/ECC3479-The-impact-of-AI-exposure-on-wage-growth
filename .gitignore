@@ -1,0 +1,29 @@
+# System files
+.DS_Store
+Thumbs.db
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# HILDA raw data (confidential - not for public sharing)
+data/raw/hilda_raw_combined_ak/
+data/raw/hilda_raw_combined_lx/
+data/raw/hilda_raw_rperson/
+data/raw/hilda_raw_eperson/
+
+# Jupyter/IDE
+.ipynb_checkpoints/
+.Rhistory
+
+# Temporary files
+*~
+*.tmp
+*.bak
