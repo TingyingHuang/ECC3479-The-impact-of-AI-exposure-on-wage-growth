@@ -1,32 +1,138 @@
-# ECC3479-The-impact-of-AI-exposure-on-wage-growth
+# ECC3479 Project: AI Exposure and Wage Growth
 
-Empirical analysis of AI occupational exposure on wage growth in Australia (2020-2024) using a Difference-in-Differences (DID) design. Built for ECC3479.
+This repository builds a reproducible pipeline to map US AI occupational exposure (AIOE) into Australian occupation codes and prepare HILDA panel data for wage-growth analysis.
 
-## Project Overview
-This project maps US AI exposure indicators to Australian occupational classifications and evaluates links with wage growth outcomes.
+Research focus: estimate how occupation-level AI exposure relates to wage outcomes in Australia, with panel methods (individual and time effects) and a DID-style interpretation for recent years.
 
-## Data Sources
-- SOC 2010 to ISCO crosswalk
-- ISCO to ANZSCO crosswalk
-- AIOE (AI occupational exposure) data
-- HILDA data (restricted)
+## 1. Repository Structure
 
-## Data Availability Statement (HILDA)
-The raw data from the Household, Income and Labour Dynamics in Australia (HILDA) Survey is highly restricted due to privacy and confidentiality agreements. Therefore, it is not included in this public repository.
+- `README.md`: project overview, setup, run order, and manual steps
+- `requirements.txt`: Python packages needed to run scripts
+- `data/raw/`: raw input data files
+- `data/clean/`: cleaned outputs used for analysis
+- `code/`: all project scripts and pipeline entry point
+- `outputs/`: model results, tables, and figures (when generated)
 
-How to obtain the data: Researchers can apply for access through the Department of Social Services (DSS) and the Melbourne Institute. Once access is granted, place the provided files in the data/raw directory according to the project scripts.
+## 2. Software Information
 
-## Repository Structure
-- data/raw: original data files (restricted files are ignored)
-- data/clean: processed datasets
-- src: cleaning and analysis scripts
-- docs: documentation and reports
-- outputs: results and visualizations
+- Python: 3.10+
+- Main packages: pandas, openpyxl, xlrd
 
-## Workflow
-1. Data cleaning: standardize occupation codes and handle mappings
-2. Linking: join US AI exposure to AU occupations
-3. Analysis: assess exposure distribution across Australian workforce
+Install from scratch:
 
-## Status
-In progress - data cleaning phase
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+## 3. Raw Data Requirements (`data/raw/`)
+
+### Public/Shareable raw files (expected in `data/raw/`)
+- `aioe_raw.xlsx`
+- `soc10_to_isco crosswalk.xls`
+- `isco_to_anzsco.xlsx.xlsx`
+
+### Restricted raw files (HILDA; not on GitHub)
+HILDA is confidential and cannot be committed to this repository.
+
+Required folders:
+- `data/raw/hilda_raw_combined_ak/`
+- `data/raw/hilda_raw_combined_lx/`
+- `data/raw/hilda_raw_rperson/`
+- `data/raw/hilda_raw_eperson/`
+
+How to obtain HILDA:
+1. Apply for access via DSS/Melbourne Institute licensing process.
+2. Download approved `.dta` files.
+3. Place files in the exact folder names above.
+
+Why not included: privacy and license restrictions.
+
+## 4. How To Run The Project From Scratch
+
+Run from repository root in this order:
+
+1. Activate environment:
+
+```bash
+source .venv/bin/activate
+```
+
+2. Optional one-command pipeline:
+
+```bash
+bash code/run_pipeline.sh
+```
+
+3. Equivalent step-by-step commands (same order as grading/reproducibility):
+
+```bash
+python code/profile_raw_data.py
+python code/mapping_aioe_to_anzsco.py
+python code/index_hilda_files.py
+python code/profile_hilda_variables.py
+python code/build_hilda_minipanel.py
+```
+
+4. Expected outputs in `data/clean/` after successful run:
+- `aioe_by_anzsco.csv`
+- `aioe_mapping_paths.csv`
+- `cleaning_qa_summary.csv`
+- `hilda_file_index.csv`
+- `hilda_variable_index.csv`
+- `hilda_variable_candidates.csv`
+- `hilda_combined_minipanel.csv` (restricted/local)
+- `hilda_combined_variable_coverage.csv` (restricted/local)
+
+### Script run order and purpose
+1. `code/profile_raw_data.py`
+	- sanity-check raw mapping files before transformation
+2. `code/mapping_aioe_to_anzsco.py`
+	- build SOC -> ISCO -> ANZSCO mapping outputs and QA summary
+3. `code/index_hilda_files.py`
+	- index all HILDA files and wave coverage
+4. `code/profile_hilda_variables.py`
+	- profile variable availability across HILDA files
+5. `code/build_hilda_minipanel.py`
+	- extract person-wave mini panel for analysis variables
+
+Manual steps outside code (must do):
+1. Obtain and place HILDA files in `data/raw/` (restricted data step).
+2. Confirm file names/folders match this README before running scripts.
+3. Keep restricted HILDA raw and derived files private (already gitignored).
+
+## 5. Clean Data Outputs (`data/clean/`)
+
+### Core analysis tables
+- `aioe_by_anzsco.csv`
+  - Occupation-level AI exposure after mapping to ANZSCO
+  - Main fields: `anzsco_code`, `aioe_mean`, `n_paths`
+- `hilda_combined_minipanel.csv` (restricted; local only)
+  - Person-wave panel extracted from HILDA Combined files
+  - Main fields: `xwaveid`, `year`, `jbmo62`, `crpay`, `hgsex`, `hgage`, `hhstate`
+
+### Mapping transparency and QA tables
+- `aioe_mapping_paths.csv`: full SOC -> ISCO -> ANZSCO path-level mapping
+- `soc_to_isco_mapping.csv`: cleaned SOC-ISCO links
+- `isco_to_anzsco_mapping.csv`: cleaned ISCO-ANZSCO links
+- `cleaning_qa_summary.csv`: coverage and QA metrics
+
+### HILDA structure/diagnostic tables (restricted; local only)
+- `hilda_file_index.csv`: file inventory by dataset and wave
+- `hilda_file_profile.csv`: number of columns by file
+- `hilda_variable_index.csv`: variable presence frequency across files
+- `hilda_variable_candidates.csv`: high-coverage candidate variables
+- `hilda_combined_variable_coverage.csv`: extracted-variable availability by wave
+
+Variable definitions are documented in:
+- `data/clean/data_codebook.md`
+
+## 6. Reproducibility Statement
+
+If you follow this README exactly (environment + raw files + script order), you should reproduce the analysis-ready clean outputs generated by this pipeline.
+
+Important exception:
+- HILDA-derived files are intentionally excluded from GitHub due to confidentiality.
+- The pipeline remains reproducible for licensed users with approved HILDA access.

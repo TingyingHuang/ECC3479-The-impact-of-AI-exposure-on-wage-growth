@@ -19,6 +19,11 @@ data/raw/hilda_raw_combined_lx/
 data/raw/hilda_raw_rperson/
 data/raw/hilda_raw_eperson/
 
+# HILDA derived outputs (also restricted)
+data/clean/hilda_*.csv
+data/clean/*hilda*.csv
+data/clean/hilda_*.parquet
+
 # Local research/methodology notes (for presentation prep, not for GitHub)
 docs/METHODOLOGY_RESEARCH_NOTES.md
 docs/*_NOTES.md
