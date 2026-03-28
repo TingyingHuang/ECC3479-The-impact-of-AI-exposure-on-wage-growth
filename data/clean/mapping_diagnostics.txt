@@ -1,0 +1,54 @@
+================================================================================
+AIOE → ANZSCO MAPPING DIAGNOSTICS
+================================================================================
+
+STAGE 1: Raw Data
+--------------------------------------------------------------------------------
+AIOE records: 774
+  Unique SOC codes: 774
+  AIOE range: [-1.853906, 1.925633]
+  Missing AIOE: 0
+
+SOC↔ISCO crosswalk: 1125 rows
+  Unique SOC: 840
+  Unique ISCO: 438
+  SOC codes with 1:N ISCO: 154
+  Max SOC→ISCO multiplicity: 17
+
+ISCO↔ANZSCO crosswalk: 1345 rows
+  Unique ISCO: 436
+  Unique ANZSCO: 1076
+  ISCO codes with 1:N ANZSCO: 288
+  Max ISCO→ANZSCO multiplicity: 32
+
+STAGE 2: After Equal-Weight Mapping
+--------------------------------------------------------------------------------
+AIOE records after full chain: 4019
+  (expansion due to 1:N mappings)
+
+STAGE 3: ANZSCO Aggregation
+--------------------------------------------------------------------------------
+Final unique ANZSCO: 186
+  AIOE (mean) range: [-0.819012, 0.706285]
+  AIOE (sum) range: [-10.647162, 19.244390]
+  Paths per ANZSCO (median): 5.0
+  Paths per ANZSCO (max): 38
+
+COVERAGE ANALYSIS
+--------------------------------------------------------------------------------
+Original AIOE SOC codes: 774
+SOC codes successfully mapped: 774
+Coverage: 100.00%
+
+TOP 10 OCCUPATIONS BY AI EXPOSURE (mean)
+--------------------------------------------------------------------------------
+242211 | p                                                  | AIOE=0.5064 (n=38)
+552314 | p                                                  | AIOE=0.5470 (n=9)
+272499 | p                                                  | AIOE=0.5520 (n=8)
+233914 | p                                                  | AIOE=0.1760 (n=19)
+222299 | p                                                  | AIOE=0.6481 (n=5)
+552312 | p                                                  | AIOE=0.3805 (n=8)
+599999 | p                                                  | AIOE=0.2560 (n=8)
+139999 | p                                                  | AIOE=0.2890 (n=7)
+223112 | p                                                  | AIOE=0.1509 (n=13)
+521211 | p                                                  | AIOE=0.6413 (n=3)

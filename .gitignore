@@ -19,6 +19,10 @@ data/raw/hilda_raw_combined_lx/
 data/raw/hilda_raw_rperson/
 data/raw/hilda_raw_eperson/
 
+# Local research/methodology notes (for presentation prep, not for GitHub)
+docs/METHODOLOGY_RESEARCH_NOTES.md
+docs/*_NOTES.md
+
 # Jupyter/IDE
 .ipynb_checkpoints/
 .Rhistory
