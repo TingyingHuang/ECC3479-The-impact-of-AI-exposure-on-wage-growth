@@ -1,0 +1,14 @@
+metric,value
+aioe_rows,774.0
+aioe_unique_soc,774.0
+aioe_missing_aioe,0.0
+soc_isco_rows,1125.0
+soc_isco_soc_multi_map,154.0
+isco_anz_rows,1345.0
+isco_anz_isco_multi_map,288.0
+coverage_soc_to_isco,0.9987080103359173
+coverage_soc_to_anzsco,0.9961240310077519
+aioe_describe_mean,3.8759690559032906e-09
+aioe_describe_std,1.000000012448706
+aioe_describe_min,-1.853906
+aioe_describe_max,1.925633
