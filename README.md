@@ -140,3 +140,9 @@ If you follow this README exactly (environment + raw files + script order), you 
 Important exception:
 - HILDA-derived files are intentionally excluded from GitHub due to confidentiality.
 - The pipeline remains reproducible for licensed users with approved HILDA access.
+
+## 7. Progress Record For Review
+
+For a step-by-step record of what was cleaned, what code was added, and what outputs were produced at each stage, see:
+
+- `PROGRESS_TIMELINE.md`
