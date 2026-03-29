@@ -91,18 +91,18 @@ def build_qa(aioe, soc_isco, isco_anz, mapped):
 def main():
     CLEAN_DIR.mkdir(parents=True, exist_ok=True)
 
-    aioe = load_aioe(RAW_DIR / "aioe_raw.xlsx")
-    soc_isco = load_soc_to_isco(RAW_DIR / "soc10_to_isco crosswalk.xls")
-    isco_anz = load_isco_to_anzsco(RAW_DIR / "isco_to_anzsco.xlsx.xlsx")
+    aioe = load_aioe(RAW_DIR / "01_aioe_raw.xlsx")
+    soc_isco = load_soc_to_isco(RAW_DIR / "02_soc10_to_isco_crosswalk.xls")
+    isco_anz = load_isco_to_anzsco(RAW_DIR / "03_isco_to_anzsco.xlsx.xlsx")
 
     mapped_paths, aioe_by_anzsco, _, _ = build_mapping(aioe, soc_isco, isco_anz)
     qa = build_qa(aioe, soc_isco, isco_anz, mapped_paths)
 
-    mapped_paths.to_csv(CLEAN_DIR / "aioe_mapping_paths.csv", index=False)
-    aioe_by_anzsco.to_csv(CLEAN_DIR / "aioe_by_anzsco.csv", index=False)
-    soc_isco.to_csv(CLEAN_DIR / "soc_to_isco_mapping.csv", index=False)
-    isco_anz.to_csv(CLEAN_DIR / "isco_to_anzsco_mapping.csv", index=False)
-    qa.to_csv(CLEAN_DIR / "cleaning_qa_summary.csv", index=False)
+    soc_isco.to_csv(CLEAN_DIR / "01_soc_to_isco_mapping.csv", index=False)
+    isco_anz.to_csv(CLEAN_DIR / "02_isco_to_anzsco_mapping.csv", index=False)
+    mapped_paths.to_csv(CLEAN_DIR / "03_aioe_mapping_paths.csv", index=False)
+    aioe_by_anzsco.to_csv(CLEAN_DIR / "04_aioe_by_anzsco.csv", index=False)
+    qa.to_csv(CLEAN_DIR / "05_cleaning_qa_summary.csv", index=False)
 
     print("Cleaning complete")
     print(f"- aioe_by_anzsco rows: {len(aioe_by_anzsco)}")

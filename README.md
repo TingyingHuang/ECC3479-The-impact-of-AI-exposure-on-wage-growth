@@ -30,9 +30,10 @@ pip install -r requirements.txt
 ## 3. Raw Data Requirements (`data/raw/`)
 
 ### Public/Shareable raw files (expected in `data/raw/`)
-- `aioe_raw.xlsx`
-- `soc10_to_isco crosswalk.xls`
-- `isco_to_anzsco.xlsx.xlsx`
+- `01_aioe_raw.xlsx`
+- `02_soc10_to_isco_crosswalk.xls`
+- `03_isco_to_anzsco.xlsx.xlsx`
+- `04_soc_2010_to_2018_crosswalk.xlsx` (optional robustness file)
 
 ### Restricted raw files (HILDA; not on GitHub)
 HILDA is confidential and cannot be committed to this repository.
@@ -69,33 +70,36 @@ bash code/run_pipeline.sh
 3. Equivalent step-by-step commands (same order as grading/reproducibility):
 
 ```bash
-python code/profile_raw_data.py
-python code/mapping_aioe_to_anzsco.py
-python code/index_hilda_files.py
-python code/profile_hilda_variables.py
-python code/build_hilda_minipanel.py
+python code/01_profile_raw_data.py
+python code/02_mapping_aioe_to_anzsco.py
+python code/03_index_hilda_files.py
+python code/04_profile_hilda_variables.py
+python code/05_build_hilda_minipanel.py
 ```
 
 4. Expected outputs in `data/clean/` after successful run:
-- `aioe_by_anzsco.csv`
-- `aioe_mapping_paths.csv`
-- `cleaning_qa_summary.csv`
-- `hilda_file_index.csv`
-- `hilda_variable_index.csv`
-- `hilda_variable_candidates.csv`
-- `hilda_combined_minipanel.csv` (restricted/local)
-- `hilda_combined_variable_coverage.csv` (restricted/local)
+- `01_soc_to_isco_mapping.csv`
+- `02_isco_to_anzsco_mapping.csv`
+- `03_aioe_mapping_paths.csv`
+- `04_aioe_by_anzsco.csv`
+- `05_cleaning_qa_summary.csv`
+- `06_hilda_file_index.csv`
+- `07_hilda_file_profile.csv`
+- `08_hilda_variable_index.csv`
+- `09_hilda_variable_candidates.csv`
+- `10_hilda_combined_minipanel.csv` (restricted/local)
+- `11_hilda_combined_variable_coverage.csv` (restricted/local)
 
 ### Script run order and purpose
-1. `code/profile_raw_data.py`
+1. `code/01_profile_raw_data.py`
 	- sanity-check raw mapping files before transformation
-2. `code/mapping_aioe_to_anzsco.py`
+2. `code/02_mapping_aioe_to_anzsco.py`
 	- build SOC -> ISCO -> ANZSCO mapping outputs and QA summary
-3. `code/index_hilda_files.py`
+3. `code/03_index_hilda_files.py`
 	- index all HILDA files and wave coverage
-4. `code/profile_hilda_variables.py`
+4. `code/04_profile_hilda_variables.py`
 	- profile variable availability across HILDA files
-5. `code/build_hilda_minipanel.py`
+5. `code/05_build_hilda_minipanel.py`
 	- extract person-wave mini panel for analysis variables
 
 Manual steps outside code (must do):
@@ -106,28 +110,28 @@ Manual steps outside code (must do):
 ## 5. Clean Data Outputs (`data/clean/`)
 
 ### Core analysis tables
-- `aioe_by_anzsco.csv`
+- `04_aioe_by_anzsco.csv`
   - Occupation-level AI exposure after mapping to ANZSCO
   - Main fields: `anzsco_code`, `aioe_mean`, `n_paths`
-- `hilda_combined_minipanel.csv` (restricted; local only)
+- `10_hilda_combined_minipanel.csv` (restricted; local only)
   - Person-wave panel extracted from HILDA Combined files
   - Main fields: `xwaveid`, `year`, `jbmo62`, `crpay`, `hgsex`, `hgage`, `hhstate`
 
 ### Mapping transparency and QA tables
-- `aioe_mapping_paths.csv`: full SOC -> ISCO -> ANZSCO path-level mapping
-- `soc_to_isco_mapping.csv`: cleaned SOC-ISCO links
-- `isco_to_anzsco_mapping.csv`: cleaned ISCO-ANZSCO links
-- `cleaning_qa_summary.csv`: coverage and QA metrics
+- `03_aioe_mapping_paths.csv`: full SOC -> ISCO -> ANZSCO path-level mapping
+- `01_soc_to_isco_mapping.csv`: cleaned SOC-ISCO links
+- `02_isco_to_anzsco_mapping.csv`: cleaned ISCO-ANZSCO links
+- `05_cleaning_qa_summary.csv`: coverage and QA metrics
 
 ### HILDA structure/diagnostic tables (restricted; local only)
-- `hilda_file_index.csv`: file inventory by dataset and wave
-- `hilda_file_profile.csv`: number of columns by file
-- `hilda_variable_index.csv`: variable presence frequency across files
-- `hilda_variable_candidates.csv`: high-coverage candidate variables
-- `hilda_combined_variable_coverage.csv`: extracted-variable availability by wave
+- `06_hilda_file_index.csv`: file inventory by dataset and wave
+- `07_hilda_file_profile.csv`: number of columns by file
+- `08_hilda_variable_index.csv`: variable presence frequency across files
+- `09_hilda_variable_candidates.csv`: high-coverage candidate variables
+- `11_hilda_combined_variable_coverage.csv`: extracted-variable availability by wave
 
 Variable definitions are documented in:
-- `data/clean/data_codebook.md`
+- `data/clean/00_data_codebook.md`
 
 ## 6. Reproducibility Statement
 

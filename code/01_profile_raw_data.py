@@ -17,7 +17,7 @@ def main() -> None:
 
     # AIOE
     print_section("AIOE: LM AIOE")
-    aioe = pd.read_excel(raw / "aioe_raw.xlsx", sheet_name="LM AIOE")
+    aioe = pd.read_excel(raw / "01_aioe_raw.xlsx", sheet_name="LM AIOE")
     aioe["soc10"] = aioe["SOC Code"].astype(str).str.strip()
     print("shape:", aioe.shape)
     print("columns:", list(aioe.columns))
@@ -28,7 +28,7 @@ def main() -> None:
     # SOC to ISCO
     print_section("SOC2010 -> ISCO08")
     soc_isco = pd.read_excel(
-        raw / "soc10_to_isco crosswalk.xls",
+        raw / "02_soc10_to_isco_crosswalk.xls",
         sheet_name="2010 SOC to ISCO-08",
         header=6,
     )
@@ -48,7 +48,7 @@ def main() -> None:
     # ISCO to ANZSCO
     print_section("ISCO08 -> ANZSCO (Table 3)")
     isco_anz = pd.read_excel(
-        raw / "isco_to_anzsco.xlsx.xlsx",
+        raw / "03_isco_to_anzsco.xlsx.xlsx",
         sheet_name="Table 3",
         header=5,
     )
@@ -70,7 +70,7 @@ def main() -> None:
     # SOC version crosswalk
     print_section("SOC2010 -> SOC2018")
     soc_shift = pd.read_excel(
-        raw / "soc_2010_to_2018_crosswalk (1).xlsx",
+        raw / "04_soc_2010_to_2018_crosswalk.xlsx",
         sheet_name="Sorted by 2010",
         header=8,
     )

@@ -107,8 +107,8 @@ def main():
     # Keep id as string for safe merges.
     panel["xwaveid"] = panel["xwaveid"].astype(str).str.strip()
 
-    panel_out = CLEAN_DIR / "hilda_combined_minipanel.csv"
-    cov_out = CLEAN_DIR / "hilda_combined_variable_coverage.csv"
+    panel_out = CLEAN_DIR / "10_hilda_combined_minipanel.csv"
+    cov_out = CLEAN_DIR / "11_hilda_combined_variable_coverage.csv"
 
     panel.to_csv(panel_out, index=False)
     coverage.to_csv(cov_out, index=False)

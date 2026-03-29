@@ -2,7 +2,7 @@
 
 This file documents the meaning and intended use of the cleaned datasets in `data/clean/`.
 
-## 1) aioe_by_anzsco.csv
+## 1) 04_aioe_by_anzsco.csv
 
 Purpose:
 - Main occupation-level exposure table used to attach AI exposure to Australian occupation groups.
@@ -17,7 +17,7 @@ Variables:
 - `aioe_sum`: Sum of path-level AI exposure contributions.
 - `n_paths`: Number of mapping paths contributing to this ANZSCO code.
 
-## 2) aioe_mapping_paths.csv
+## 2) 03_aioe_mapping_paths.csv
 
 Purpose:
 - Full mapping audit trail from SOC to ISCO to ANZSCO.
@@ -35,7 +35,7 @@ Variables:
 - `n_anzsco`: Number of ANZSCO matches for the ISCO code.
 - `aioe_path`: Final path-level exposure contribution.
 
-## 3) soc_to_isco_mapping.csv
+## 3) 01_soc_to_isco_mapping.csv
 
 Purpose:
 - Cleaned SOC to ISCO crosswalk used by the mapping pipeline.
@@ -45,7 +45,7 @@ Variables:
 - `isco_code`: ISCO-08 code.
 - `isco_title`: ISCO occupation title.
 
-## 4) isco_to_anzsco_mapping.csv
+## 4) 02_isco_to_anzsco_mapping.csv
 
 Purpose:
 - Cleaned ISCO to ANZSCO crosswalk used by the mapping pipeline.
@@ -55,7 +55,7 @@ Variables:
 - `anzsco_code`: ANZSCO code.
 - `anzsco_title`: ANZSCO occupation title.
 
-## 5) cleaning_qa_summary.csv
+## 5) 05_cleaning_qa_summary.csv
 
 Purpose:
 - Quality checks and mapping coverage diagnostics.
@@ -67,7 +67,7 @@ Variables:
 - `metric`: Metric name.
 - `value`: Metric value.
 
-## 6) hilda_combined_minipanel.csv (restricted, local only)
+## 6) 10_hilda_combined_minipanel.csv (restricted, local only)
 
 Purpose:
 - Analysis-ready person-wave mini panel from HILDA Combined files.
@@ -91,7 +91,7 @@ Key variables:
 Important note:
 - HILDA negative/special codes (for example, -1, -10) should be treated as invalid/missing in analysis.
 
-## 7) hilda_combined_variable_coverage.csv (restricted, local only)
+## 7) 11_hilda_combined_variable_coverage.csv (restricted, local only)
 
 Purpose:
 - Tracks extracted-variable availability across waves/files.
@@ -100,7 +100,7 @@ Variables:
 - `file_name`, `wave`, `year`, `n_rows`, `n_selected_vars`
 - `has_*` indicators for each extracted variable.
 
-## 8) hilda_file_index.csv / hilda_file_profile.csv / hilda_variable_index.csv / hilda_variable_candidates.csv
+## 8) 06_hilda_file_index.csv / 07_hilda_file_profile.csv / 08_hilda_variable_index.csv / 09_hilda_variable_candidates.csv
 
 Purpose:
 - Data engineering diagnostics used to index HILDA files and identify stable variables.
