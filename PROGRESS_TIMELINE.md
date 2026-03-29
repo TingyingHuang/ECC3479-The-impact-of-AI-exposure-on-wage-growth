@@ -83,11 +83,34 @@ What was done:
 Why it matters:
 - Reviewers can reproduce outputs directly from README and understand progress at each stage.
 
+## Stage 6: Build Final Analysis-Ready Datasets (12/13)
+
+Script:
+- `code/06_build_hilda_ai_analysis_panel.py`
+
+What was cleaned/transformed:
+- Merged wages, controls, and occupation-level AI exposure into one modeling table.
+- Constructed core outcome variable `wage_growth_log_1y` from consecutive-year log pay changes.
+- Aggregated AIOE from ANZSCO 6-digit to ANZSCO 2-digit to match HILDA occupation coding.
+
+Main outputs:
+- `data/clean/12_hilda_ai_analysis_panel.csv` (restricted/local)
+- `data/clean/13_hilda_ai_analysis_qa.csv` (restricted/local)
+
+What these outputs do:
+- `12_hilda_ai_analysis_panel.csv` is an analysis-ready input dataset that can be used directly for regression.
+- `13_hilda_ai_analysis_qa.csv` is a QA/audit table reporting sample size and coverage (rows, people, years, exposure match, wage-growth availability).
+- These files document data readiness; they are not empirical result tables and do not by themselves provide causal conclusions.
+
+Why it matters:
+- Clearly separates data preparation completion from the next modeling stage.
+- Makes the transition to estimation transparent for reviewers.
+
 ## Current State
 
 Completed:
-- End-to-end data preparation pipeline through clean, ordered outputs.
+- End-to-end data preparation pipeline through clean, ordered outputs (01-13).
 - Documentation suitable for course submission and reproducibility checks.
 
-Next analysis step (not yet included in this timeline):
-- Build final model-ready table with wage growth variables and merged AI exposure for estimation.
+Next analysis step:
+- Run baseline and robustness regressions using the analysis-ready panel.
