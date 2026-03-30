@@ -98,13 +98,9 @@ def main():
     mapped_paths, aioe_by_anzsco, _, _ = build_mapping(aioe, soc_isco, isco_anz)
     qa = build_qa(aioe, soc_isco, isco_anz, mapped_paths)
 
-    soc_isco.to_csv(CLEAN_DIR / "01_soc_to_isco_mapping.csv", index=False)
-    isco_anz.to_csv(CLEAN_DIR / "02_isco_to_anzsco_mapping.csv", index=False)
-    mapped_paths.to_csv(CLEAN_DIR / "03_aioe_mapping_paths.csv", index=False)
-    aioe_by_anzsco.to_csv(CLEAN_DIR / "04_aioe_by_anzsco.csv", index=False)
-    qa.to_csv(CLEAN_DIR / "05_cleaning_qa_summary.csv", index=False)
+    aioe_by_anzsco.to_csv(CLEAN_DIR / "01_aioe_by_anzsco.csv", index=False)
 
-    print("Cleaning complete")
+    print("Cleaning complete (final mapping only)")
     print(f"- aioe_by_anzsco rows: {len(aioe_by_anzsco)}")
     print(f"- coverage_soc_to_anzsco: {qa.loc[qa['metric'] == 'coverage_soc_to_anzsco', 'value'].iloc[0]:.3%}")
 

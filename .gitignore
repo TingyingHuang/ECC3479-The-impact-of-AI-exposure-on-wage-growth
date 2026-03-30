@@ -19,7 +19,7 @@ data/raw/hilda_raw_combined_lx/
 data/raw/hilda_raw_rperson/
 data/raw/hilda_raw_eperson/
 
-# HILDA derived outputs (also restricted)
+# HILDA derived outputs (also restricted - includes analysis panel with individual-level wage data)
 data/clean/hilda_*.csv
 data/clean/*hilda*.csv
 data/clean/hilda_*.parquet
