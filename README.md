@@ -4,6 +4,10 @@ This repository builds a reproducible pipeline to map US AI occupational exposur
 
 Research focus: estimate how occupation-level AI exposure relates to wage outcomes in Australia, with panel methods (individual and time effects) and a DID-style interpretation for recent years.
 
+Research question: What is the effect of high AI occupational exposure on annual wage growth for
+white-collar professionals in Australia over the period 2020 to 2025 , compared with
+white-collar occupations with low AI exposure?
+
 ## 1. Repository Structure
 
 ```text
