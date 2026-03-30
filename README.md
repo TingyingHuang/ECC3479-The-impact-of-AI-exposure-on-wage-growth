@@ -6,12 +6,17 @@ Research focus: estimate how occupation-level AI exposure relates to wage outcom
 
 ## 1. Repository Structure
 
-- `README.md`: project overview, setup, run order, and manual steps
-- `requirements.txt`: Python packages needed to run scripts
-- `data/raw/`: raw input data files
-- `data/clean/`: cleaned outputs used for analysis
-- `code/`: all project scripts and pipeline entry point
-- `outputs/`: model results, tables, and figures (when generated)
+```text
+ecc3479-project/
+├── code/                          ← all project scripts and pipeline entry point
+├── data/
+│   ├── raw/                       ← raw input data files
+│   └── clean/                     ← cleaned outputs used for analysis
+├── docs/                          ← project notes and supporting documents
+├── outputs/                       ← model results, tables, and figures (when generated)
+├── requirements.txt               ← Python packages needed to run scripts
+└── README.md                      ← project overview, setup, run order, and manual steps
+```
 
 ## 2. Software Information
 
@@ -52,12 +57,6 @@ In this project, these are extracted/renamed to:
 - zip 2 -> `data/raw/hilda_raw_combined_lx/`
 - zip 3 -> `data/raw/hilda_raw_rperson/`
 - zip 4 -> `data/raw/hilda_raw_eperson/`
-
-Required folders:
-- `data/raw/hilda_raw_combined_ak/`
-- `data/raw/hilda_raw_combined_lx/`
-- `data/raw/hilda_raw_rperson/`
-- `data/raw/hilda_raw_eperson/`
 
 How to obtain HILDA:
 1. Apply for access via DSS/Melbourne Institute licensing process.
