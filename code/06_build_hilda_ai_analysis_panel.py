@@ -4,6 +4,7 @@ import pandas as pd
 
 
 CLEAN_DIR = Path("data/clean")
+PAY_CANDIDATES = ["jbmspay", "crpay", "jbmpays"]
 
 
 def normalize_occ_code(value, width: int):
@@ -39,6 +40,28 @@ def build_aioe_2digit(aioe_path: Path) -> pd.DataFrame:
     return out
 
 
+def build_harmonized_pay(df: pd.DataFrame) -> pd.DataFrame:
+    """Build a pay field with source fallback while preserving source provenance."""
+    out = df.copy()
+
+    for col in PAY_CANDIDATES:
+        if col in out.columns:
+            out[col] = pd.to_numeric(out[col], errors="coerce")
+            out.loc[out[col] < 0, col] = pd.NA
+
+    out["pay"] = pd.NA
+    out["pay_source"] = pd.NA
+
+    for col in PAY_CANDIDATES:
+        if col not in out.columns:
+            continue
+        fill_mask = out["pay"].isna() & out[col].notna() & (out[col] > 0)
+        out.loc[fill_mask, "pay"] = out.loc[fill_mask, col]
+        out.loc[fill_mask, "pay_source"] = col
+
+    return out
+
+
 def main() -> None:
     hilda_path = CLEAN_DIR / "06_hilda_combined_minipanel.csv"
     aioe_path = CLEAN_DIR / "01_aioe_by_anzsco.csv"
@@ -55,25 +78,33 @@ def main() -> None:
     hilda["anzsco2"] = hilda["jbmo62"].map(lambda x: normalize_occ_code(x, 2))
 
     # Convert core numeric fields and treat HILDA negative codes as missing.
-    for col in ["crpay", "hgage", "hgsex", "hhstate", "jbocct", "jbcmocc"]:
+    for col in ["hgage", "hgsex", "hhstate", "jbocct", "jbcmocc"]:
         if col in hilda.columns:
             hilda[col] = pd.to_numeric(hilda[col], errors="coerce")
             hilda.loc[hilda[col] < 0, col] = pd.NA
 
     hilda["year"] = pd.to_numeric(hilda["year"], errors="coerce")
 
-    # Keep valid pay rows for main outcome construction.
-    hilda = hilda.loc[hilda["crpay"].notna() & (hilda["crpay"] > 0)].copy()
+    hilda = build_harmonized_pay(hilda)
 
-    # Build 1-year log wage growth where observations are consecutive years.
+    # Keep valid pay rows for main outcome construction.
+    hilda = hilda.loc[hilda["pay"].notna() & (hilda["pay"] > 0)].copy()
+
+    # Build 1-year log wage growth where observations are consecutive years
+    # and drawn from the same pay source to avoid definition shifts.
     hilda = hilda.sort_values(["xwaveid", "year"])
-    hilda["ln_crpay"] = hilda["crpay"].map(lambda x: pd.NA if pd.isna(x) or x <= 0 else float(np.log(x)))
+    hilda["ln_pay"] = hilda["pay"].map(lambda x: pd.NA if pd.isna(x) or x <= 0 else float(np.log(x)))
     hilda["lag_year"] = hilda.groupby("xwaveid")["year"].shift(1)
-    hilda["lag_ln_crpay"] = hilda.groupby("xwaveid")["ln_crpay"].shift(1)
+    hilda["lag_ln_pay"] = hilda.groupby("xwaveid")["ln_pay"].shift(1)
+    hilda["lag_pay_source"] = hilda.groupby("xwaveid")["pay_source"].shift(1)
 
     hilda["is_consecutive_year"] = (hilda["year"] - hilda["lag_year"] == 1).astype(int)
-    hilda["wage_growth_log_1y"] = hilda["ln_crpay"] - hilda["lag_ln_crpay"]
-    hilda.loc[hilda["is_consecutive_year"] != 1, "wage_growth_log_1y"] = pd.NA
+    hilda["same_pay_source_as_lag"] = (hilda["pay_source"] == hilda["lag_pay_source"]).astype(int)
+    hilda["wage_growth_log_1y"] = hilda["ln_pay"] - hilda["lag_ln_pay"]
+    hilda.loc[
+        (hilda["is_consecutive_year"] != 1) | (hilda["same_pay_source_as_lag"] != 1),
+        "wage_growth_log_1y",
+    ] = pd.NA
 
     aioe2 = build_aioe_2digit(aioe_path)
     merged = hilda.merge(aioe2, on="anzsco2", how="left")
@@ -85,8 +116,9 @@ def main() -> None:
         "year",
         "anzsco2",
         "aioe2_mean",
-        "crpay",
-        "ln_crpay",
+        "pay",
+        "pay_source",
+        "ln_pay",
         "wage_growth_log_1y",
         "hgsex",
         "hgage",
@@ -108,10 +140,35 @@ def main() -> None:
             {"metric": "unique_people", "value": merged["xwaveid"].nunique()},
             {"metric": "year_min", "value": merged["year"].min()},
             {"metric": "year_max", "value": merged["year"].max()},
+            {
+                "metric": "pay_source_jbmspay_rows",
+                "value": int((merged["pay_source"] == "jbmspay").sum()),
+            },
+            {
+                "metric": "pay_source_crpay_rows",
+                "value": int((merged["pay_source"] == "crpay").sum()),
+            },
+            {
+                "metric": "pay_source_jbmpays_rows",
+                "value": int((merged["pay_source"] == "jbmpays").sum()),
+            },
             {"metric": "rows_with_aioe", "value": int(merged["aioe2_mean"].notna().sum())},
             {
                 "metric": "rows_with_wage_growth",
                 "value": int(merged["wage_growth_log_1y"].notna().sum()),
+            },
+            {
+                "metric": "years_with_rows",
+                "value": ",".join(str(int(y)) for y in sorted(merged["year"].dropna().unique())),
+            },
+            {
+                "metric": "years_with_wage_growth",
+                "value": ",".join(
+                    str(int(y))
+                    for y in sorted(
+                        merged.loc[merged["wage_growth_log_1y"].notna(), "year"].dropna().unique()
+                    )
+                ),
             },
         ]
     )
