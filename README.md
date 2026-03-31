@@ -36,15 +36,7 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-**Windows (Command Prompt):**
-```bash
-python -m venv .venv
-.venv\Scripts\activate.bat
-pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-**Windows (PowerShell):**
+**Windows:**
 ```bash
 python -m venv .venv
 .venv\Scripts\Activate.ps1
@@ -96,12 +88,7 @@ Run from repository root in this order:
 source .venv/bin/activate
 ```
 
-**Windows (Command Prompt):**
-```bash
-.venv\Scripts\activate.bat
-```
-
-**Windows (PowerShell):**
+**Windows:**
 ```bash
 .venv\Scripts\Activate.ps1
 ```
