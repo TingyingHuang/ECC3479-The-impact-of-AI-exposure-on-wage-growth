@@ -16,7 +16,6 @@ ecc3479-project/
 ├── data/
 │   ├── raw/                       ← raw input data files
 │   └── clean/                     ← cleaned outputs used for analysis
-├── docs/                          ← project notes and supporting documents
 ├── outputs/                       ← model results, tables, and figures (when generated)
 ├── requirements.txt               ← Python packages needed to run scripts
 └── README.md                      ← project overview, setup, run order, and manual steps
@@ -27,11 +26,28 @@ ecc3479-project/
 - Python: 3.10+
 - Main packages: pandas, openpyxl, xlrd
 
-Install from scratch:
+### Install from scratch
 
+**macOS / Linux:**
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+**Windows (Command Prompt):**
+```bash
+python -m venv .venv
+.venv\Scripts\activate.bat
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+**Windows (PowerShell):**
+```bash
+python -m venv .venv
+.venv\Scripts\Activate.ps1
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
@@ -75,8 +91,19 @@ Run from repository root in this order:
 
 1. Activate environment:
 
+**macOS / Linux:**
 ```bash
 source .venv/bin/activate
+```
+
+**Windows (Command Prompt):**
+```bash
+.venv\Scripts\activate.bat
+```
+
+**Windows (PowerShell):**
+```bash
+.venv\Scripts\Activate.ps1
 ```
 
 2. Optional one-command pipeline:
