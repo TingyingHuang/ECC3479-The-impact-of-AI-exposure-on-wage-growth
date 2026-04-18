@@ -5,6 +5,9 @@ import pandas as pd
 
 CLEAN_DIR = Path("data/clean")
 PAY_CANDIDATES = ["jbmspay", "crpay", "jbmpays"]
+YEAR_MIN = 2020
+YEAR_MAX = 2024
+WHITE_COLLAR_MAJOR_GROUPS = {"1", "2", "3", "4"}
 
 
 def normalize_occ_code(value, width: int):
@@ -106,8 +109,51 @@ def main() -> None:
         "wage_growth_log_1y",
     ] = pd.NA
 
+    # Build occupation-mobility indicators from occupation-code changes.
+    hilda["lag_anzsco2"] = hilda.groupby("xwaveid")["anzsco2"].shift(1)
+    hilda["occ_changed_anzsco2_1y"] = pd.NA
+    valid_occ_change = (
+        hilda["is_consecutive_year"].eq(1)
+        & hilda["anzsco2"].notna()
+        & hilda["lag_anzsco2"].notna()
+    )
+    hilda.loc[valid_occ_change, "occ_changed_anzsco2_1y"] = (
+        hilda.loc[valid_occ_change, "anzsco2"] != hilda.loc[valid_occ_change, "lag_anzsco2"]
+    ).astype(int)
+
+    # Build a white-collar marker from ANZSCO major groups (1-4).
+    hilda["anzsco_major"] = hilda["anzsco2"].astype("string").str.slice(0, 1)
+    hilda["is_white_collar"] = hilda["anzsco_major"].isin(WHITE_COLLAR_MAJOR_GROUPS).astype(int)
+
     aioe2 = build_aioe_2digit(aioe_path)
     merged = hilda.merge(aioe2, on="anzsco2", how="left")
+
+    # Restrict to policy window and white-collar analysis sample.
+    merged = merged.loc[
+        merged["year"].between(YEAR_MIN, YEAR_MAX, inclusive="both")
+        & merged["is_white_collar"].eq(1)
+    ].copy()
+
+    # Policy/exposure indicators for the new research question.
+    merged["post_2021"] = (merged["year"] >= 2021).astype(int)
+    aioe_cutoff = merged["aioe2_mean"].median(skipna=True)
+    merged["high_ai_exposure"] = pd.NA
+    merged.loc[merged["aioe2_mean"].notna(), "high_ai_exposure"] = (
+        merged.loc[merged["aioe2_mean"].notna(), "aioe2_mean"] >= aioe_cutoff
+    ).astype(int)
+    merged["high_ai_x_post2021"] = pd.NA
+    valid_interaction = merged["high_ai_exposure"].notna()
+    merged.loc[valid_interaction, "high_ai_x_post2021"] = (
+        merged.loc[valid_interaction, "high_ai_exposure"].astype(int) * merged.loc[valid_interaction, "post_2021"]
+    )
+
+    merged["high_ai_x_post2021_x_mobility"] = pd.NA
+    valid_triple = valid_interaction & merged["occ_changed_anzsco2_1y"].notna()
+    merged.loc[valid_triple, "high_ai_x_post2021_x_mobility"] = (
+        merged.loc[valid_triple, "high_ai_exposure"].astype(int)
+        * merged.loc[valid_triple, "post_2021"]
+        * merged.loc[valid_triple, "occ_changed_anzsco2_1y"].astype(int)
+    )
 
     # Keep a compact analysis column set.
     keep_cols = [
@@ -115,11 +161,18 @@ def main() -> None:
         "wave",
         "year",
         "anzsco2",
+        "anzsco_major",
+        "is_white_collar",
         "aioe2_mean",
+        "high_ai_exposure",
+        "post_2021",
+        "high_ai_x_post2021",
         "pay",
         "pay_source",
         "ln_pay",
         "wage_growth_log_1y",
+        "occ_changed_anzsco2_1y",
+        "high_ai_x_post2021_x_mobility",
         "hgsex",
         "hgage",
         "hhstate",
@@ -152,10 +205,35 @@ def main() -> None:
                 "metric": "pay_source_jbmpays_rows",
                 "value": int((merged["pay_source"] == "jbmpays").sum()),
             },
+            {"metric": "aioe2_mean_median_cutoff", "value": float(aioe_cutoff) if pd.notna(aioe_cutoff) else pd.NA},
             {"metric": "rows_with_aioe", "value": int(merged["aioe2_mean"].notna().sum())},
+            {
+                "metric": "rows_high_ai_exposure",
+                "value": int((merged["high_ai_exposure"] == 1).sum()),
+            },
+            {
+                "metric": "rows_low_ai_exposure",
+                "value": int((merged["high_ai_exposure"] == 0).sum()),
+            },
+            {
+                "metric": "rows_post_2021",
+                "value": int((merged["post_2021"] == 1).sum()),
+            },
+            {
+                "metric": "rows_pre_2021",
+                "value": int((merged["post_2021"] == 0).sum()),
+            },
             {
                 "metric": "rows_with_wage_growth",
                 "value": int(merged["wage_growth_log_1y"].notna().sum()),
+            },
+            {
+                "metric": "rows_with_occ_mobility_indicator",
+                "value": int(merged["occ_changed_anzsco2_1y"].notna().sum()),
+            },
+            {
+                "metric": "rows_occ_changed_anzsco2_1y",
+                "value": int((merged["occ_changed_anzsco2_1y"] == 1).sum()),
             },
             {
                 "metric": "years_with_rows",

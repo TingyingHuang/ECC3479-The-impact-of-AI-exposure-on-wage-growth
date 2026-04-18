@@ -1,12 +1,11 @@
-# ECC3479 Project: AI Exposure and Wage Growth
+# ECC3479 Project: AI Exposure, Occupational Mobility, and Wage Adjustment
 
-This repository builds a reproducible pipeline to map US AI occupational exposure (AIOE) into Australian occupation codes and prepare HILDA panel data for wage-growth analysis.
+This repository builds a reproducible pipeline to map US AI occupational exposure (AIOE) into Australian occupation codes and prepare HILDA panel data for labor-market adjustment analysis.
 
-Research focus: estimate how occupation-level AI exposure relates to wage outcomes in Australia, with panel methods (individual and time effects) and a DID-style interpretation for recent years.
+Research focus: examine how occupational mobility and worker characteristics shape wage adjustment among white-collar workers in Australia, and evaluate the role of occupation-level AI exposure in that adjustment.
 
-Research question: What is the effect of high AI occupational exposure on annual wage growth for
-white-collar professionals in Australia over the period 2020 to 2025 , compared with
-white-collar occupations with low AI exposure?
+Research question:
+What is the effect of the post-2021 AI policy and high AI occupational exposure on occupational mobility and annual wage adjustment for white-collar professionals in Australia over the period 2020 to 2024, compared with white-collar occupations with low AI exposure?
 
 ## 1. Repository Structure
 
@@ -138,7 +137,7 @@ python code/06_build_hilda_ai_analysis_panel.py
 5. `code/05_build_hilda_minipanel.py`
 	- extract person-wave mini panel for analysis variables
 6. `code/06_build_hilda_ai_analysis_panel.py`
-	- clean wage fields, build 1-year wage growth, and merge 2-digit AIOE exposure
+	- clean wage fields, build 1-year wage growth, construct occupational-mobility indicators, merge 2-digit AIOE exposure, and derive policy/exposure design variables (`post_2021`, high/low AI exposure, interactions) for the 2020-2024 white-collar sample
 
 Manual steps outside code (must do):
 1. Obtain and place HILDA files in `data/raw/` (restricted data step).
@@ -158,8 +157,8 @@ Manual steps outside code (must do):
   - Person-wave panel extracted from HILDA Combined files
   - Main fields: `xwaveid`, `year`, `jbmo62`, `crpay`, `hgsex`, `hgage`, `hhstate`
 - `08_hilda_ai_analysis_panel.csv` (restricted; local only)
-	- Analysis-ready merged panel with wage-growth outcome and occupation-level AI exposure
-	- Main fields: `xwaveid`, `year`, `anzsco2`, `aioe2_mean`, `wage_growth_log_1y`
+	- Analysis-ready merged panel for wage adjustment and occupational mobility analysis with occupation-level AI exposure
+	- Main fields: `xwaveid`, `year`, `anzsco2`, `anzsco_major`, `is_white_collar`, `aioe2_mean`, `high_ai_exposure`, `post_2021`, `high_ai_x_post2021`, `pay`, `ln_pay`, `wage_growth_log_1y`, `occ_changed_anzsco2_1y`, `high_ai_x_post2021_x_mobility`, `jbocct`, `jbcmocc`, `hgsex`, `hgage`, `hhstate`
 - `09_hilda_ai_analysis_qa.csv` (restricted; local only)
 	- QA summary for final analysis sample size and coverage
 

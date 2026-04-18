@@ -123,10 +123,18 @@ Unit:
 Key variables:
 - `xwaveid`, `wave`, `year`: panel identifiers.
 - `anzsco2`: normalized 2-digit occupation code for merge.
+- `anzsco_major`: first digit of ANZSCO major group.
+- `is_white_collar`: white-collar marker from ANZSCO major groups 1-4.
 - `aioe2_mean`: mean AI exposure at 2-digit occupation level.
-- `crpay`: cleaned positive pay measure.
-- `ln_crpay`: log pay.
+- `high_ai_exposure`: high AI exposure indicator based on within-sample median `aioe2_mean`.
+- `post_2021`: policy-period indicator (`year >= 2021`).
+- `high_ai_x_post2021`: interaction of exposure group and policy period.
+- `pay`: cleaned positive pay measure.
+- `pay_source`: source variable selected for harmonized pay (`jbmspay`, `crpay`, `jbmpays`).
+- `ln_pay`: log pay.
 - `wage_growth_log_1y`: one-year log wage growth for consecutive years.
+- `occ_changed_anzsco2_1y`: occupation-mobility indicator based on 1-year ANZSCO2 change.
+- `high_ai_x_post2021_x_mobility`: triple interaction for exposure, policy period, and mobility.
 - `hgsex`, `hgage`, `hhstate`, `jbocct`, `jbcmocc`: controls/context variables.
 
 ## 9) 09_hilda_ai_analysis_qa.csv (restricted, local only)
