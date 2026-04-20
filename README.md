@@ -1,11 +1,11 @@
-# ECC3479 Project: AI Exposure, Occupational Mobility, and Wage Adjustment
+# ECC3479 Project: AI Exposure, Occupational Mobility, and Wage Growth
 
-This repository builds a reproducible pipeline to map US AI occupational exposure (AIOE) into Australian occupation codes and prepare HILDA panel data for labor-market adjustment analysis.
+This repository builds a reproducible pipeline to map US AI occupational exposure (AIOE) into Australian occupation codes and prepare HILDA panel data for wage-growth analysis.
 
-Research focus: examine how occupational mobility and worker characteristics shape wage adjustment among white-collar workers in Australia, and evaluate the role of occupation-level AI exposure in that adjustment.
+Research focus: examine how occupational mobility and worker characteristics relate to annual wage growth among white-collar workers in Australia, and test whether this differs by occupation-level AI exposure.
 
 Research question:
-What is the effect of the post-2021 AI policy and high AI occupational exposure on occupational mobility and annual wage adjustment for white-collar professionals in Australia over the period 2020 to 2024, compared with white-collar occupations with low AI exposure?
+What is the effect of high AI occupational exposure on annual wage growth for white-collar professionals in Australia over the period 2020 to 2024, compared with white-collar occupations with low AI exposure?
 
 ## 1. Repository Structure
 
@@ -15,7 +15,7 @@ ecc3479-project/
 ├── data/
 │   ├── raw/                       ← raw input data files
 │   └── clean/                     ← cleaned outputs used for analysis
-├── outputs/                       ← model results, tables, and figures (when generated)
+├── output/                        ← model results, tables, and figures (when generated)
 ├── requirements.txt               ← Python packages needed to run scripts
 └── README.md                      ← project overview, setup, run order, and manual steps
 ```
@@ -23,7 +23,7 @@ ecc3479-project/
 ## 2. Software Information
 
 - Python: 3.10+
-- Main packages: pandas, openpyxl, xlrd
+- Main packages: pandas, openpyxl, xlrd, statsmodels
 
 ### Install from scratch
 
@@ -157,7 +157,7 @@ Manual steps outside code (must do):
   - Person-wave panel extracted from HILDA Combined files
   - Main fields: `xwaveid`, `year`, `jbmo62`, `crpay`, `hgsex`, `hgage`, `hhstate`
 - `08_hilda_ai_analysis_panel.csv` (restricted; local only)
-	- Analysis-ready merged panel for wage adjustment and occupational mobility analysis with occupation-level AI exposure
+	- Analysis-ready merged panel for annual wage-growth and occupational-mobility analysis with occupation-level AI exposure
 	- Main fields: `xwaveid`, `year`, `anzsco2`, `anzsco_major`, `is_white_collar`, `aioe2_mean`, `high_ai_exposure`, `post_2021`, `high_ai_x_post2021`, `pay`, `ln_pay`, `wage_growth_log_1y`, `occ_changed_anzsco2_1y`, `high_ai_x_post2021_x_mobility`, `jbocct`, `jbcmocc`, `hgsex`, `hgage`, `hhstate`
 - `09_hilda_ai_analysis_qa.csv` (restricted; local only)
 	- QA summary for final analysis sample size and coverage
