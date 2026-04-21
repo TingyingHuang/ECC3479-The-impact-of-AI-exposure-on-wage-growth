@@ -119,8 +119,8 @@ def main():
     var_index = pd.concat([rperson_vars, combined_vars], ignore_index=True)
     file_index = pd.concat([rperson_files, combined_files], ignore_index=True)
 
-    file_index.to_csv(CLEAN_DIR / "03_hilda_file_profile.csv", index=False)
-    var_index.to_csv(CLEAN_DIR / "04_hilda_variable_index.csv", index=False)
+    file_index.to_csv(CLEAN_DIR / "03_hilda_file_schema.csv", index=False)
+    var_index.to_csv(CLEAN_DIR / "04_hilda_variable_frequency.csv", index=False)
 
     # Short candidate list for next-step extraction
     candidates = var_index[
@@ -129,8 +129,8 @@ def main():
     candidates = candidates.sort_values(["dataset", "tag", "share_of_files", "variable"], ascending=[True, True, False, True])
     candidates.to_csv(CLEAN_DIR / "05_hilda_variable_candidates.csv", index=False)
 
-    print(f"Saved: {CLEAN_DIR / '03_hilda_file_profile.csv'}")
-    print(f"Saved: {CLEAN_DIR / '04_hilda_variable_index.csv'}")
+    print(f"Saved: {CLEAN_DIR / '03_hilda_file_schema.csv'}")
+    print(f"Saved: {CLEAN_DIR / '04_hilda_variable_frequency.csv'}")
     print(f"Saved: {CLEAN_DIR / '05_hilda_variable_candidates.csv'}")
 
     for ds in ["Rperson", "Combined"]:

@@ -1,11 +1,35 @@
-# ECC3479 Project: AI Exposure, Occupational Mobility, and Wage Growth
+# ECC3479 Project: AI Exposure and Wage Growth across All Occupations in Australia
 
-This repository builds a reproducible pipeline to map US AI occupational exposure (AIOE) into Australian occupation codes and prepare HILDA panel data for wage-growth analysis.
+This repository builds a reproducible pipeline to map US AI occupational exposure (AIOE) into Australian occupation codes and prepare HILDA panel data for econometric analysis.
 
-Research focus: examine how occupational mobility and worker characteristics relate to annual wage growth among white-collar workers in Australia, and test whether this differs by occupation-level AI exposure.
+## Research Question
 
-Research question:
-What is the effect of high AI occupational exposure on annual wage growth for white-collar professionals in Australia over the period 2020 to 2024, compared with white-collar occupations with low AI exposure?
+How does occupational AI exposure affect wages across all occupations in Australia over the period 2020–2024, and how has that effect changed year by year?
+
+## Empirical Strategy: Time-Varying Coefficient Model
+
+Rather than splitting occupations into a binary "high/low AI" treatment group (DiD), this project uses a **time-varying coefficient model** that interacts the continuous AI exposure score with year dummies:
+
+```
+log_wage_{it} = α
+              + β_2021·(AI_i × yr_2021_t)
+              + β_2022·(AI_i × yr_2022_t)
+              + β_2023·(AI_i × yr_2023_t)
+              + β_2024·(AI_i × yr_2024_t)
+              + γ·X_{it} + μ_i + ε_{it}
+```
+
+**Why this design:**
+
+- **Continuous exposure, not binary.** `AI_i` is the occupation-level AIOE score — a continuous measure of how much of the occupation's task content can be performed by AI. Using it directly avoids the information loss and arbitrary threshold of a binary "high/low" split.
+- **Time-varying coefficients β_t.** Each β_t gives the marginal wage return to AI exposure in year t, relative to the base year 2020. Plotting β_t over 2021–2024 traces the trajectory of AI's wage impact as generative AI became commercially widespread.
+- **Individual fixed effects μ_i.** Absorbs all time-invariant unobserved heterogeneity (ability, firm type, career path), so β_t is identified purely from within-person variation over time.
+- **Base year 2020.** Pre-dates the mass deployment of generative AI (ChatGPT launched late 2022). β_t = 0 in 2020 by construction; subsequent coefficients measure the divergence from that baseline.
+
+**Interpretation:**
+- If β_t increases over time → AI complements human labour in high-exposure occupations, producing a rising wage premium.
+- If β_t decreases or turns negative → AI substitutes for labour, suppressing wages in exposed occupations.
+- A flat β_t → AI exposure has no differential wage effect despite adoption.
 
 ## 1. Repository Structure
 
@@ -109,14 +133,14 @@ python code/06_build_hilda_ai_analysis_panel.py
 
 4. Expected outputs in `data/clean/` after successful run:
 - `01_aioe_by_anzsco.csv`
-- `02_hilda_file_index.csv`
-- `03_hilda_file_profile.csv`
-- `04_hilda_variable_index.csv`
+- `02_hilda_file_inventory.csv`
+- `03_hilda_file_schema.csv`
+- `04_hilda_variable_frequency.csv`
 - `05_hilda_variable_candidates.csv`
-- `06_hilda_combined_minipanel.csv` (restricted/local)
-- `07_hilda_combined_variable_coverage.csv` (restricted/local)
-- `08_hilda_ai_analysis_panel.csv` (restricted/local)
-- `09_hilda_ai_analysis_qa.csv` (restricted/local)
+- `06_hilda_person_wave_panel.csv` (restricted/local)
+- `07_hilda_variable_coverage_by_wave.csv` (restricted/local)
+- `08_wages_ai_analysis_panel.csv` (restricted/local)
+- `09_wages_ai_panel_qa.csv` (restricted/local)
 
 ### Occupation matching note (for empirical transparency)
 - HILDA occupation in this project uses ANZSCO 2-digit code (`jbmo62`).
@@ -137,7 +161,7 @@ python code/06_build_hilda_ai_analysis_panel.py
 5. `code/05_build_hilda_minipanel.py`
 	- extract person-wave mini panel for analysis variables
 6. `code/06_build_hilda_ai_analysis_panel.py`
-	- clean wage fields, build 1-year wage growth, construct occupational-mobility indicators, merge 2-digit AIOE exposure, and derive policy/exposure design variables (`post_2021`, high/low AI exposure, interactions) for the 2020-2024 white-collar sample
+	- harmonise wages (`wscmg` annual gross wages, `wscmga` imputed fallback), build log wage, construct white/blue collar markers, merge 2-digit AIOE exposure, and pre-compute year dummies and `ai_exposure × yr_t` interaction terms for the time-varying coefficient model (2020–2024, all occupations)
 
 Manual steps outside code (must do):
 1. Obtain and place HILDA files in `data/raw/` (restricted data step).
@@ -153,22 +177,22 @@ Manual steps outside code (must do):
 - `01_aioe_by_anzsco.csv`
   - Occupation-level AI exposure after mapping to ANZSCO
   - Main fields: `anzsco_code`, `aioe_mean`, `n_paths`
-- `06_hilda_combined_minipanel.csv` (restricted; local only)
+- `06_hilda_person_wave_panel.csv` (restricted; local only)
   - Person-wave panel extracted from HILDA Combined files
-  - Main fields: `xwaveid`, `year`, `jbmo62`, `crpay`, `hgsex`, `hgage`, `hhstate`
-- `08_hilda_ai_analysis_panel.csv` (restricted; local only)
-	- Analysis-ready merged panel for annual wage-growth and occupational-mobility analysis with occupation-level AI exposure
-	- Main fields: `xwaveid`, `year`, `anzsco2`, `anzsco_major`, `is_white_collar`, `aioe2_mean`, `high_ai_exposure`, `post_2021`, `high_ai_x_post2021`, `pay`, `ln_pay`, `wage_growth_log_1y`, `occ_changed_anzsco2_1y`, `high_ai_x_post2021_x_mobility`, `jbocct`, `jbcmocc`, `hgsex`, `hgage`, `hhstate`
-- `09_hilda_ai_analysis_qa.csv` (restricted; local only)
+  - Main fields: `xwaveid`, `year`, `jbmo62`, `jbmspay`, `jbmpays`, `crpay`, `hgsex`, `hgage`, `hhstate`, `edhigh1`
+- `08_wages_ai_analysis_panel.csv` (restricted; local only)
+	- Final model-ready panel for the time-varying coefficient model
+	- Main fields: `person_id`, `year`, `occ_code`, `occ_major_group`, `white_collar`, `blue_collar`, `ai_exposure`, `annual_wage`, `log_wage`, `sex`, `age`, `state`, `edu`, `yr_2021`-`yr_2024`, `ai_x_yr2021`-`ai_x_yr2024`
+- `09_wages_ai_panel_qa.csv` (restricted; local only)
 	- QA summary for final analysis sample size and coverage
 
 ### Mapping transparency and QA tables
 - Mapping intermediates are generated in memory and collapsed to the final occupation exposure table `01_aioe_by_anzsco.csv`.
 
 ### HILDA structure/diagnostic tables (restricted; local only)
-- `02_hilda_file_index.csv`: file inventory by dataset and wave
-- `03_hilda_file_profile.csv`: number of columns by file
-- `04_hilda_variable_index.csv`: variable presence frequency across files
+- `02_hilda_file_inventory.csv`: file inventory by dataset and wave
+- `03_hilda_file_schema.csv`: number of columns by file
+- `04_hilda_variable_frequency.csv`: variable presence frequency across files
 - `05_hilda_variable_candidates.csv`: high-coverage candidate variables
-- `07_hilda_combined_variable_coverage.csv`: extracted-variable availability by wave
+- `07_hilda_variable_coverage_by_wave.csv`: extracted-variable availability by wave
 

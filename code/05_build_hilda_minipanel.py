@@ -14,17 +14,13 @@ COMBINED_FOLDERS = [
 
 # Keep this list short and model-oriented.
 VAR_STEMS = [
-    "jbmo62",    # current main job occupation: 2-digit ANZSCO 2006
-    "jbmo61",    # current main job occupation: 1-digit ANZSCO 2006
-    "jbcmocc",   # occupation changed since last interview (not occupation code)
-    "jbocct",    # tenure in current occupation (years)
-    "hehearn",   # earnings-related
-    "jbmspay",   # pay-related
-    "jbmpays",   # pay-related
-    "crpay",     # pay-related
+    "jbmo62",    # 2-digit ANZSCO occupation code (main job)
+    "wscmg",     # annual gross wages/salary — main/only job (financial year, continuous AUD)
+    "wscmga",    # imputed version of wscmg (fallback for missing)
     "hgsex",     # sex
     "hgage",     # age
-    "hhstate",   # state
+    "hhstate",   # state of residence
+    "edhigh1",   # highest education level (categorical 1–10)
 ]
 
 
@@ -107,8 +103,8 @@ def main():
     # Keep id as string for safe merges.
     panel["xwaveid"] = panel["xwaveid"].astype(str).str.strip()
 
-    panel_out = CLEAN_DIR / "06_hilda_combined_minipanel.csv"
-    cov_out = CLEAN_DIR / "07_hilda_combined_variable_coverage.csv"
+    panel_out = CLEAN_DIR / "06_hilda_person_wave_panel.csv"
+    cov_out = CLEAN_DIR / "07_hilda_variable_coverage_by_wave.csv"
 
     panel.to_csv(panel_out, index=False)
     coverage.to_csv(cov_out, index=False)

@@ -4,7 +4,7 @@ import pandas as pd
 
 
 CLEAN_DIR = Path("data/clean")
-PAY_CANDIDATES = ["jbmspay", "crpay", "jbmpays"]
+PAY_CANDIDATES = ["wscmg", "wscmga"]
 YEAR_MIN = 2020
 YEAR_MAX = 2024
 WHITE_COLLAR_MAJOR_GROUPS = {"1", "2", "3", "4"}
@@ -44,29 +44,22 @@ def build_aioe_2digit(aioe_path: Path) -> pd.DataFrame:
 
 
 def build_harmonized_pay(df: pd.DataFrame) -> pd.DataFrame:
-    """Build a pay field with source fallback while preserving source provenance."""
     out = df.copy()
-
     for col in PAY_CANDIDATES:
         if col in out.columns:
             out[col] = pd.to_numeric(out[col], errors="coerce")
             out.loc[out[col] < 0, col] = pd.NA
-
     out["pay"] = pd.NA
-    out["pay_source"] = pd.NA
-
     for col in PAY_CANDIDATES:
         if col not in out.columns:
             continue
         fill_mask = out["pay"].isna() & out[col].notna() & (out[col] > 0)
         out.loc[fill_mask, "pay"] = out.loc[fill_mask, col]
-        out.loc[fill_mask, "pay_source"] = col
-
     return out
 
 
 def main() -> None:
-    hilda_path = CLEAN_DIR / "06_hilda_combined_minipanel.csv"
+    hilda_path = CLEAN_DIR / "06_hilda_person_wave_panel.csv"
     aioe_path = CLEAN_DIR / "01_aioe_by_anzsco.csv"
 
     if not hilda_path.exists():
@@ -81,7 +74,7 @@ def main() -> None:
     hilda["anzsco2"] = hilda["jbmo62"].map(lambda x: normalize_occ_code(x, 2))
 
     # Convert core numeric fields and treat HILDA negative codes as missing.
-    for col in ["hgage", "hgsex", "hhstate", "jbocct", "jbcmocc"]:
+    for col in ["hgage", "hgsex", "hhstate", "edhigh1"]:
         if col in hilda.columns:
             hilda[col] = pd.to_numeric(hilda[col], errors="coerce")
             hilda.loc[hilda[col] < 0, col] = pd.NA
@@ -90,164 +83,89 @@ def main() -> None:
 
     hilda = build_harmonized_pay(hilda)
 
-    # Keep valid pay rows for main outcome construction.
+    # Keep valid pay rows.
     hilda = hilda.loc[hilda["pay"].notna() & (hilda["pay"] > 0)].copy()
 
-    # Build 1-year log wage growth where observations are consecutive years
-    # and drawn from the same pay source to avoid definition shifts.
-    hilda = hilda.sort_values(["xwaveid", "year"])
+    # Build log wage.
     hilda["ln_pay"] = hilda["pay"].map(lambda x: pd.NA if pd.isna(x) or x <= 0 else float(np.log(x)))
-    hilda["lag_year"] = hilda.groupby("xwaveid")["year"].shift(1)
-    hilda["lag_ln_pay"] = hilda.groupby("xwaveid")["ln_pay"].shift(1)
-    hilda["lag_pay_source"] = hilda.groupby("xwaveid")["pay_source"].shift(1)
 
-    hilda["is_consecutive_year"] = (hilda["year"] - hilda["lag_year"] == 1).astype(int)
-    hilda["same_pay_source_as_lag"] = (hilda["pay_source"] == hilda["lag_pay_source"]).astype(int)
-    hilda["wage_growth_log_1y"] = hilda["ln_pay"] - hilda["lag_ln_pay"]
-    hilda.loc[
-        (hilda["is_consecutive_year"] != 1) | (hilda["same_pay_source_as_lag"] != 1),
-        "wage_growth_log_1y",
-    ] = pd.NA
-
-    # Build occupation-mobility indicators from occupation-code changes.
-    hilda["lag_anzsco2"] = hilda.groupby("xwaveid")["anzsco2"].shift(1)
-    hilda["occ_changed_anzsco2_1y"] = pd.NA
-    valid_occ_change = (
-        hilda["is_consecutive_year"].eq(1)
-        & hilda["anzsco2"].notna()
-        & hilda["lag_anzsco2"].notna()
-    )
-    hilda.loc[valid_occ_change, "occ_changed_anzsco2_1y"] = (
-        hilda.loc[valid_occ_change, "anzsco2"] != hilda.loc[valid_occ_change, "lag_anzsco2"]
-    ).astype(int)
-
-    # Build a white-collar marker from ANZSCO major groups (1-4).
+    # Build white-collar (ANZSCO 1-4) and blue-collar (ANZSCO 5-8) markers.
     hilda["anzsco_major"] = hilda["anzsco2"].astype("string").str.slice(0, 1)
     hilda["is_white_collar"] = hilda["anzsco_major"].isin(WHITE_COLLAR_MAJOR_GROUPS).astype(int)
+    hilda["is_blue_collar"] = (
+        hilda["anzsco_major"].notna() & ~hilda["anzsco_major"].isin(WHITE_COLLAR_MAJOR_GROUPS)
+    ).astype(int)
 
     aioe2 = build_aioe_2digit(aioe_path)
     merged = hilda.merge(aioe2, on="anzsco2", how="left")
 
-    # Restrict to policy window and white-collar analysis sample.
+    # Restrict to policy window.
     merged = merged.loc[
         merged["year"].between(YEAR_MIN, YEAR_MAX, inclusive="both")
-        & merged["is_white_collar"].eq(1)
     ].copy()
 
-    # Policy/exposure indicators for the new research question.
-    merged["post_2021"] = (merged["year"] >= 2021).astype(int)
-    aioe_cutoff = merged["aioe2_mean"].median(skipna=True)
-    merged["high_ai_exposure"] = pd.NA
-    merged.loc[merged["aioe2_mean"].notna(), "high_ai_exposure"] = (
-        merged.loc[merged["aioe2_mean"].notna(), "aioe2_mean"] >= aioe_cutoff
-    ).astype(int)
-    merged["high_ai_x_post2021"] = pd.NA
-    valid_interaction = merged["high_ai_exposure"].notna()
-    merged.loc[valid_interaction, "high_ai_x_post2021"] = (
-        merged.loc[valid_interaction, "high_ai_exposure"].astype(int) * merged.loc[valid_interaction, "post_2021"]
-    )
-
-    merged["high_ai_x_post2021_x_mobility"] = pd.NA
-    valid_triple = valid_interaction & merged["occ_changed_anzsco2_1y"].notna()
-    merged.loc[valid_triple, "high_ai_x_post2021_x_mobility"] = (
-        merged.loc[valid_triple, "high_ai_exposure"].astype(int)
-        * merged.loc[valid_triple, "post_2021"]
-        * merged.loc[valid_triple, "occ_changed_anzsco2_1y"].astype(int)
-    )
+    # Year dummies (base = YEAR_MIN) and AI exposure × year interactions.
+    # Each ai_x_yr{t} = ai_exposure * I(year == t); NA where ai_exposure is missing.
+    yr_cols = []
+    for yr in range(YEAR_MIN + 1, YEAR_MAX + 1):
+        d_col = f"yr_{yr}"
+        ix_col = f"ai_x_yr{yr}"
+        merged[d_col] = (merged["year"] == yr).astype(int)
+        merged[ix_col] = pd.NA
+        has_ai = merged["aioe2_mean"].notna()
+        merged.loc[has_ai, ix_col] = merged.loc[has_ai, "aioe2_mean"] * merged.loc[has_ai, d_col]
+        yr_cols.extend([d_col, ix_col])
 
     # Keep a compact analysis column set.
-    keep_cols = [
-        "xwaveid",
-        "wave",
-        "year",
-        "anzsco2",
-        "anzsco_major",
-        "is_white_collar",
-        "aioe2_mean",
-        "high_ai_exposure",
-        "post_2021",
-        "high_ai_x_post2021",
-        "pay",
-        "pay_source",
-        "ln_pay",
-        "wage_growth_log_1y",
-        "occ_changed_anzsco2_1y",
-        "high_ai_x_post2021_x_mobility",
-        "hgsex",
-        "hgage",
-        "hhstate",
-        "jbocct",
-        "jbcmocc",
-    ]
+    keep_cols = (
+        ["xwaveid", "year", "anzsco2", "anzsco_major", "is_white_collar", "is_blue_collar",
+         "aioe2_mean", "pay", "ln_pay", "hgsex", "hgage", "hhstate", "edhigh1"]
+        + yr_cols
+    )
     keep_cols = [c for c in keep_cols if c in merged.columns]
     merged = merged[keep_cols]
 
-    out_panel = CLEAN_DIR / "08_hilda_ai_analysis_panel.csv"
-    out_qa = CLEAN_DIR / "09_hilda_ai_analysis_qa.csv"
+    rename_map = {
+        "xwaveid": "person_id",
+        "anzsco2": "occ_code",
+        "anzsco_major": "occ_major_group",
+        "is_white_collar": "white_collar",
+        "is_blue_collar": "blue_collar",
+        "aioe2_mean": "ai_exposure",
+        "pay": "annual_wage",
+        "ln_pay": "log_wage",
+        "hgsex": "sex",
+        "hgage": "age",
+        "hhstate": "state",
+        "edhigh1": "edu",
+    }
+    merged = merged.rename(columns={k: v for k, v in rename_map.items() if k in merged.columns})
+
+    out_panel = CLEAN_DIR / "08_wages_ai_analysis_panel.csv"
+    out_qa = CLEAN_DIR / "09_wages_ai_panel_qa.csv"
 
     merged.to_csv(out_panel, index=False)
 
+    actual_yrs = sorted(merged["year"].dropna().unique())
     qa = pd.DataFrame(
         [
             {"metric": "rows", "value": len(merged)},
-            {"metric": "unique_people", "value": merged["xwaveid"].nunique()},
+            {"metric": "unique_people", "value": merged["person_id"].nunique()},
             {"metric": "year_min", "value": merged["year"].min()},
             {"metric": "year_max", "value": merged["year"].max()},
-            {
-                "metric": "pay_source_jbmspay_rows",
-                "value": int((merged["pay_source"] == "jbmspay").sum()),
-            },
-            {
-                "metric": "pay_source_crpay_rows",
-                "value": int((merged["pay_source"] == "crpay").sum()),
-            },
-            {
-                "metric": "pay_source_jbmpays_rows",
-                "value": int((merged["pay_source"] == "jbmpays").sum()),
-            },
-            {"metric": "aioe2_mean_median_cutoff", "value": float(aioe_cutoff) if pd.notna(aioe_cutoff) else pd.NA},
-            {"metric": "rows_with_aioe", "value": int(merged["aioe2_mean"].notna().sum())},
-            {
-                "metric": "rows_high_ai_exposure",
-                "value": int((merged["high_ai_exposure"] == 1).sum()),
-            },
-            {
-                "metric": "rows_low_ai_exposure",
-                "value": int((merged["high_ai_exposure"] == 0).sum()),
-            },
-            {
-                "metric": "rows_post_2021",
-                "value": int((merged["post_2021"] == 1).sum()),
-            },
-            {
-                "metric": "rows_pre_2021",
-                "value": int((merged["post_2021"] == 0).sum()),
-            },
-            {
-                "metric": "rows_with_wage_growth",
-                "value": int(merged["wage_growth_log_1y"].notna().sum()),
-            },
-            {
-                "metric": "rows_with_occ_mobility_indicator",
-                "value": int(merged["occ_changed_anzsco2_1y"].notna().sum()),
-            },
-            {
-                "metric": "rows_occ_changed_anzsco2_1y",
-                "value": int((merged["occ_changed_anzsco2_1y"] == 1).sum()),
-            },
+            {"metric": "rows_with_ai_exposure", "value": int(merged["ai_exposure"].notna().sum())},
+            {"metric": "rows_missing_ai_exposure", "value": int(merged["ai_exposure"].isna().sum())},
+            {"metric": "rows_white_collar", "value": int((merged["white_collar"] == 1).sum())},
+            {"metric": "rows_blue_collar", "value": int((merged["blue_collar"] == 1).sum())},
+            {"metric": "rows_with_edu", "value": int(merged["edu"].notna().sum()) if "edu" in merged.columns else 0},
             {
                 "metric": "years_with_rows",
-                "value": ",".join(str(int(y)) for y in sorted(merged["year"].dropna().unique())),
+                "value": ",".join(str(int(y)) for y in actual_yrs),
             },
-            {
-                "metric": "years_with_wage_growth",
-                "value": ",".join(
-                    str(int(y))
-                    for y in sorted(
-                        merged.loc[merged["wage_growth_log_1y"].notna(), "year"].dropna().unique()
-                    )
-                ),
-            },
+        ]
+        + [
+            {"metric": f"rows_yr_{int(yr)}", "value": int((merged["year"] == yr).sum())}
+            for yr in actual_yrs
         ]
     )
     qa.to_csv(out_qa, index=False)

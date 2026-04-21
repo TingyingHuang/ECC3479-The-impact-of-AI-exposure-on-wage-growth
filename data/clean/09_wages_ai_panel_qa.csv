@@ -1,0 +1,16 @@
+metric,value
+rows,45147
+unique_people,14399
+year_min,2020
+year_max,2024
+rows_with_ai_exposure,44577
+rows_missing_ai_exposure,570
+rows_white_collar,29259
+rows_blue_collar,15504
+rows_with_edu,45147
+years_with_rows,"2020,2021,2022,2023,2024"
+rows_yr_2020,8964
+rows_yr_2021,8832
+rows_yr_2022,8944
+rows_yr_2023,8841
+rows_yr_2024,9566

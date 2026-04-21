@@ -45,7 +45,7 @@ def main():
     out = out.sort_values(["dataset", "wave", "file_name"]).reset_index(drop=True)
 
     CLEAN_DIR.mkdir(parents=True, exist_ok=True)
-    out_path = CLEAN_DIR / "02_hilda_file_index.csv"
+    out_path = CLEAN_DIR / "02_hilda_file_inventory.csv"
     out.to_csv(out_path, index=False)
 
     print(f"Indexed files: {len(out)}")
