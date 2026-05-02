@@ -6,30 +6,29 @@ This repository builds a reproducible pipeline to map US AI occupational exposur
 
 How does occupational AI exposure affect wages across all occupations in Australia over the period 2020–2024, and how has that effect changed year by year?
 
-## Empirical Strategy: Time-Varying Coefficient Model
+## Empirical Strategy
 
-Rather than splitting occupations into a binary "high/low AI" treatment group (DiD), this project uses a **time-varying coefficient model** that interacts the continuous AI exposure score with year dummies:
+This project estimates the causal effect of occupational AI exposure on individual wage growth using a **two-way fixed effects (TWFE) event-study model** with a continuous treatment intensity.
+
+**Primary specification:**
 
 ```
-log_wage_{it} = α
-              + β_2021·(AI_i × yr_2021_t)
-              + β_2022·(AI_i × yr_2022_t)
-              + β_2023·(AI_i × yr_2023_t)
-              + β_2024·(AI_i × yr_2024_t)
-              + γ·X_{it} + μ_i + ε_{it}
+log_wage_{it} = β_2021·(AI_i × 1{t=2021})
+              + β_2022·(AI_i × 1{t=2022})
+              + β_2023·(AI_i × 1{t=2023})
+              + β_2024·(AI_i × 1{t=2024})
+              + γ·X_{it} + μ_i + λ_t + ε_{it}
 ```
 
-**Why this design:**
+where `AI_i` is each individual's **2020 baseline occupation AI exposure score** (held fixed regardless of subsequent job changes), `μ_i` are individual fixed effects, and `λ_t` are year fixed effects. Standard errors are clustered at the individual level.
 
-- **Continuous exposure, not binary.** `AI_i` is the occupation-level AIOE score — a continuous measure of how much of the occupation's task content can be performed by AI. Using it directly avoids the information loss and arbitrary threshold of a binary "high/low" split.
-- **Time-varying coefficients β_t.** Each β_t gives the marginal wage return to AI exposure in year t, relative to the base year 2020. Plotting β_t over 2021–2024 traces the trajectory of AI's wage impact as generative AI became commercially widespread.
-- **Individual fixed effects μ_i.** Absorbs all time-invariant unobserved heterogeneity (ability, firm type, career path), so β_t is identified purely from within-person variation over time.
-- **Base year 2020.** Pre-dates the mass deployment of generative AI (ChatGPT launched late 2022). β_t = 0 in 2020 by construction; subsequent coefficients measure the divergence from that baseline.
+**Key design choices:**
+- **Continuous treatment, not binary.** Uses the full AIOE score rather than a high/low split, preserving variation across the full occupation distribution.
+- **Baseline-fixed AI exposure.** ~37.5% of individuals change occupation during 2020–2024. Fixing exposure to the 2020 value removes the endogeneity from workers selectively switching into higher-paying AI roles.
+- **Individual FE.** Absorbs all time-invariant personal characteristics; identification comes from within-person wage changes differentiated by AI exposure level.
+- **Base year 2020.** Coefficients β_t measure wage growth divergence relative to 2020.
 
-**Interpretation:**
-- If β_t increases over time → AI complements human labour in high-exposure occupations, producing a rising wage premium.
-- If β_t decreases or turns negative → AI substitutes for labour, suppressing wages in exposed occupations.
-- A flat β_t → AI exposure has no differential wage effect despite adoption.
+**Main finding:** After fixing baseline AI exposure and controlling for individual FE, workers in high-AI-exposure occupations in 2020 experienced significantly *lower* wage growth in 2021–2024 (β ranging from −0.090 to −0.205), consistent with post-COVID mean reversion of an elevated pandemic-era tech wage premium. A robustness check using time-varying AI exposure (see `output/econometric_twfe_robustness_timevarying.ipynb`) finds a positive 2021 effect (+0.083), attributable to endogenous occupational switching into high-AI roles.
 
 ## 1. Repository Structure
 
@@ -144,20 +143,25 @@ python code/06_build_hilda_ai_analysis_panel.py
 jupyter nbconvert --to notebook --execute output/primary_analysis.ipynb --output output/primary_analysis.ipynb
 ```
 
-Or open in Jupyter and run all cells. The notebook loads `data/clean/08_wages_ai_analysis_panel.csv` and writes:
-- `output/table1_regression_results.csv`
-- `output/tableA1_summary_statistics.csv`
-- `output/figure1_twfe_eventstudy.png`
-- `output/figure2_pretrend_check.png`
+Or open `output/primary_analysis.ipynb` in Jupyter and run all cells.
 
-**Step 3 — Optional detailed notebooks** (supporting analysis):
+The notebook reads these clean data files:
+- `data/clean/08_wages_ai_analysis_panel.csv` — main 2020–2024 analysis panel (TWFE models + pooled OLS)
+- `data/clean/06_hilda_person_wave_panel.csv` — full HILDA panel 2001–2024 (pre-trend check, §5)
+- `data/clean/01_aioe_by_anzsco.csv` — occupation-level AI exposure (pre-trend check, §5)
+
+And writes:
+- `output/table1_regression_results.csv` — formatted regression table
+- `output/figure1_twfe_eventstudy.png` — event-study plot
+- `output/figure2_pretrend_check.png` — pre-trend check plot
+
+**Step 3 — Optional robustness notebook:**
 
 ```bash
-jupyter nbconvert --to notebook --execute output/econometric_twfe_analysis.ipynb --inplace
-jupyter nbconvert --to notebook --execute output/econometric_eda_style_analysis.ipynb --inplace
-jupyter nbconvert --to notebook --execute output/pretrend_ai_exposure_analysis.ipynb --inplace
 jupyter nbconvert --to notebook --execute output/econometric_twfe_robustness_timevarying.ipynb --inplace
 ```
+
+This runs the time-varying AI exposure specification (reads `data/clean/08_wages_ai_analysis_panel.csv`) and explains why it diverges from the primary result.
 
 **Expected outputs in `data/clean/` after Step 1:**
 - `01_aioe_by_anzsco.csv`
