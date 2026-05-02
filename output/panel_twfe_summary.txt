@@ -1,0 +1,55 @@
+Two-Way Fixed Effects (TWFE) Model
+Controls: edu_ord (ordinal 1-7, higher=more educated; recoded from HILDA edhigh1), state dummies (categorical, 7 indicators for 8 Australian states/territories)
+Entity FE via within-transform; year FE via dummies; clustered SE at individual level
+Baseline year: 2020
+Observations: 41,156
+Individuals: 10,881
+
+Key AI exposure x year coefficients:
+                 coef   std_err   p_value    ci_low   ci_high
+ai_x_yr2021  0.082786  0.022796  0.000282  0.038106  0.127466
+ai_x_yr2022  0.002533  0.023757  0.915075 -0.044030  0.049097
+ai_x_yr2023 -0.008600  0.026611  0.746580 -0.060757  0.043558
+ai_x_yr2024 -0.041341  0.027755  0.136360 -0.095739  0.013058
+
+Full model summary:
+                                 OLS Regression Results                                
+=======================================================================================
+Dep. Variable:               log_wage   R-squared (uncentered):                   0.159
+Model:                            OLS   Adj. R-squared (uncentered):              0.159
+Method:                 Least Squares   F-statistic:                              167.9
+Date:                Tue, 28 Apr 2026   Prob (F-statistic):                        0.00
+Time:                        09:59:28   Log-Likelihood:                         -9254.6
+No. Observations:               41156   AIC:                                  1.854e+04
+Df Residuals:                   41140   BIC:                                  1.868e+04
+Df Model:                          16                                                  
+Covariance Type:              cluster                                                  
+===============================================================================
+                  coef    std err          z      P>|z|      [0.025      0.975]
+-------------------------------------------------------------------------------
+ai_x_yr2021     0.0828      0.023      3.632      0.000       0.038       0.127
+ai_x_yr2022     0.0025      0.024      0.107      0.915      -0.044       0.049
+ai_x_yr2023    -0.0086      0.027     -0.323      0.747      -0.061       0.044
+ai_x_yr2024    -0.0413      0.028     -1.489      0.136      -0.096       0.013
+edu_ord         0.2429      0.012     20.468      0.000       0.220       0.266
+st_2            0.0995      0.055      1.811      0.070      -0.008       0.207
+st_3           -0.0393      0.049     -0.794      0.427      -0.136       0.058
+st_4           -0.0522      0.076     -0.684      0.494      -0.202       0.097
+st_5            0.1763      0.088      1.998      0.046       0.003       0.349
+st_6           -0.0085      0.082     -0.103      0.918      -0.170       0.153
+st_7            0.1788      0.084      2.139      0.032       0.015       0.343
+st_8            0.1488      0.052      2.875      0.004       0.047       0.250
+yr_2021         0.0456      0.006      7.510      0.000       0.034       0.057
+yr_2022         0.1404      0.007     20.991      0.000       0.127       0.154
+yr_2023         0.2181      0.007     29.887      0.000       0.204       0.232
+yr_2024         0.2903      0.008     37.333      0.000       0.275       0.306
+==============================================================================
+Omnibus:                    12330.538   Durbin-Watson:                   1.940
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):           242340.653
+Skew:                          -0.953   Prob(JB):                         0.00
+Kurtosis:                      14.734   Cond. No.                         19.5
+==============================================================================
+
+Notes:
+[1] R² is computed without centering (uncentered) since the model does not contain a constant.
+[2] Standard Errors are robust to cluster correlation (cluster)
