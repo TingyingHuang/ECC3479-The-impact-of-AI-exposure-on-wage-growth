@@ -35,13 +35,18 @@ log_wage_{it} = α
 
 ```text
 ecc3479-project/
-├── code/                          ← all project scripts and pipeline entry point
+├── code/                                              ← data pipeline scripts (01–06)
 ├── data/
-│   ├── raw/                       ← raw input data files
-│   └── clean/                     ← cleaned outputs used for analysis
-├── output/                        ← model results, tables, and figures (when generated)
-├── requirements.txt               ← Python packages needed to run scripts
-└── README.md                      ← project overview, setup, run order, and manual steps
+│   ├── raw/                                           ← raw input data files
+│   └── clean/                                         ← cleaned outputs used for analysis
+├── output/
+│   ├── primary_analysis.ipynb                         ← PRIMARY ANALYSIS FILE (run this)
+│   ├── econometric_twfe_robustness_timevarying.ipynb  ← robustness check (time-varying AI)
+│   ├── table1_regression_results.csv                  ← formatted regression table (generated)
+│   ├── figure1_twfe_eventstudy.png                    ← event-study plot (generated)
+│   └── figure2_pretrend_check.png                     ← pre-trend check plot (generated)
+├── requirements.txt                                   ← Python packages
+└── README.md                                          ← this file
 ```
 
 ## 2. Software Information
@@ -100,9 +105,11 @@ In this project, these are extracted/renamed to:
 
 ## 4. How To Run The Project From Scratch
 
+### Full pipeline: raw data → clean data → analysis → results
+
 Run from repository root in this order:
 
-1. Activate environment:
+**Step 0 — Activate environment:**
 
 **macOS / Linux:**
 ```bash
@@ -114,13 +121,13 @@ source .venv/bin/activate
 .venv\Scripts\Activate.ps1
 ```
 
-2. Optional one-command pipeline:
+**Step 1 — Build clean data** (optional one-command pipeline):
 
 ```bash
 bash code/run_pipeline.sh
 ```
 
-3. Equivalent step-by-step commands (same order as grading/reproducibility):
+Or step-by-step:
 
 ```bash
 python code/01_profile_raw_data.py
@@ -131,7 +138,28 @@ python code/05_build_hilda_minipanel.py
 python code/06_build_hilda_ai_analysis_panel.py
 ```
 
-4. Expected outputs in `data/clean/` after successful run:
+**Step 2 — Run primary analysis** (produces all results, tables, figures):
+
+```bash
+jupyter nbconvert --to notebook --execute output/primary_analysis.ipynb --output output/primary_analysis.ipynb
+```
+
+Or open in Jupyter and run all cells. The notebook loads `data/clean/08_wages_ai_analysis_panel.csv` and writes:
+- `output/table1_regression_results.csv`
+- `output/tableA1_summary_statistics.csv`
+- `output/figure1_twfe_eventstudy.png`
+- `output/figure2_pretrend_check.png`
+
+**Step 3 — Optional detailed notebooks** (supporting analysis):
+
+```bash
+jupyter nbconvert --to notebook --execute output/econometric_twfe_analysis.ipynb --inplace
+jupyter nbconvert --to notebook --execute output/econometric_eda_style_analysis.ipynb --inplace
+jupyter nbconvert --to notebook --execute output/pretrend_ai_exposure_analysis.ipynb --inplace
+jupyter nbconvert --to notebook --execute output/econometric_twfe_robustness_timevarying.ipynb --inplace
+```
+
+**Expected outputs in `data/clean/` after Step 1:**
 - `01_aioe_by_anzsco.csv`
 - `02_hilda_file_inventory.csv`
 - `03_hilda_file_schema.csv`
