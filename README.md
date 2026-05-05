@@ -36,8 +36,8 @@ ecc3479-project/
 │   └── clean/                                         ← cleaned outputs used for analysis
 ├── output/
 │   ├── primary_analysis.ipynb         ← PRIMARY ANALYSIS — main TWFE results, declaration, threats
-│   ├── robustness_timevarying.ipynb   ← Time-varying AI exposure (Column 2 of Table 1)
-│   └── robustness_checks.ipynb        ← Comprehensive robustness suite
+│   ├── robustness_1_timevarying.ipynb   ← Time-varying AI exposure (Column 2 of Table 1)
+│   └── robustness_2_checks.ipynb        ← Comprehensive robustness suite
 ├── requirements.txt                                   ← Python packages
 └── README.md                                          ← this file
 ```
@@ -131,7 +131,7 @@ Reads: `data/clean/08_wages_ai_analysis_panel.csv`, `data/clean/06_hilda_person_
 **Step 3 — Time-varying AI exposure** (Column 2 of Table 1):
 
 ```bash
-jupyter nbconvert --to notebook --execute output/robustness_timevarying.ipynb --inplace
+jupyter nbconvert --to notebook --execute output/robustness_1_timevarying.ipynb --inplace
 ```
 
 Reads: `data/clean/08_wages_ai_analysis_panel.csv`
@@ -141,7 +141,7 @@ Reads: `data/clean/08_wages_ai_analysis_panel.csv`
 **Step 4 — Comprehensive robustness suite** (optional):
 
 ```bash
-jupyter nbconvert --to notebook --execute output/robustness_checks.ipynb --inplace
+jupyter nbconvert --to notebook --execute output/robustness_2_checks.ipynb --inplace
 ```
 
 Tests: SE formula choices, alternative control sets, alternative samples, functional form, placebo tests.
