@@ -36,8 +36,8 @@ ecc3479-project/
 │   └── clean/                                         ← cleaned outputs used for analysis
 ├── output/
 │   ├── primary_analysis.ipynb         ← PRIMARY ANALYSIS — main TWFE results, declaration, threats
-│   ├── robustness_1_timevarying.ipynb   ← Time-varying AI exposure (Column 2 of Table 1)
-│   └── robustness_2_checks.ipynb        ← Comprehensive robustness suite
+│   ├── robustness_timevarying.ipynb   ← Time-varying AI exposure (Column 2 of Table 1)
+│   └── robustness_checks.ipynb        ← Comprehensive robustness suite
 ├── requirements.txt                                   ← Python packages
 └── README.md                                          ← this file
 ```
@@ -88,7 +88,19 @@ How to obtain HILDA:
 | Zip file 3 of 4 — Rperson Data Files | `data/raw/hilda_raw_rperson/` |
 | Zip file 4 of 4 — Eperson and Other Data Files | `data/raw/hilda_raw_eperson/` |
 
-## 4. How To Run The Project From Scratch
+## 4. Clean Data Outputs (`data/clean/`)
+
+Variable definitions: `data/clean/00_data_codebook.md`
+
+| File | Description |
+|------|-------------|
+| `01_aioe_by_anzsco.csv` | Occupation-level AI exposure mapped to ANZSCO; fields: `anzsco_code`, `aioe_mean`, `n_paths` |
+| `06_hilda_person_wave_panel.csv` | Person-wave panel from HILDA Combined files (restricted) |
+| `08_wages_ai_analysis_panel.csv` | Final model-ready panel 2020–2024 (restricted); fields: `person_id`, `year`, `occ_code`, `ai_exposure`, `log_wage`, `edu`, `ai_x_yr2021`–`ai_x_yr2024` |
+| `09_wages_ai_panel_qa.csv` | QA summary for sample size and coverage (restricted) |
+| `02`–`05`, `07` | HILDA structure/diagnostic tables (restricted) |
+
+## 5. How To Run The Project From Scratch
 
 Run all commands from the repository root.
 
@@ -131,7 +143,7 @@ Reads: `data/clean/08_wages_ai_analysis_panel.csv`, `data/clean/06_hilda_person_
 **Step 3 — Time-varying AI exposure** (Column 2 of Table 1):
 
 ```bash
-jupyter nbconvert --to notebook --execute output/robustness_1_timevarying.ipynb --inplace
+jupyter nbconvert --to notebook --execute output/robustness_timevarying.ipynb --inplace
 ```
 
 Reads: `data/clean/08_wages_ai_analysis_panel.csv`
@@ -141,7 +153,7 @@ Reads: `data/clean/08_wages_ai_analysis_panel.csv`
 **Step 4 — Comprehensive robustness suite** (optional):
 
 ```bash
-jupyter nbconvert --to notebook --execute output/robustness_2_checks.ipynb --inplace
+jupyter nbconvert --to notebook --execute output/robustness_checks.ipynb --inplace
 ```
 
 Tests: SE formula choices, alternative control sets, alternative samples, functional form, placebo tests.
@@ -167,15 +179,3 @@ Tests: SE formula choices, alternative control sets, alternative samples, functi
 ### Occupation matching note
 
 HILDA occupation uses ANZSCO 2-digit code (`jbmo62`). AIOE is first mapped to ANZSCO 6-digit through SOC → ISCO → ANZSCO crosswalks, then aggregated to 2-digit for merge. Coverage is approximately 99.6% in valid occupation observations; unmatched observations (~0.4%) are kept as missing exposure in the main analysis.
-
-## 5. Clean Data Outputs (`data/clean/`)
-
-Variable definitions: `data/clean/00_data_codebook.md`
-
-| File | Description |
-|------|-------------|
-| `01_aioe_by_anzsco.csv` | Occupation-level AI exposure mapped to ANZSCO; fields: `anzsco_code`, `aioe_mean`, `n_paths` |
-| `06_hilda_person_wave_panel.csv` | Person-wave panel from HILDA Combined files (restricted) |
-| `08_wages_ai_analysis_panel.csv` | Final model-ready panel 2020–2024 (restricted); fields: `person_id`, `year`, `occ_code`, `ai_exposure`, `log_wage`, `edu`, `ai_x_yr2021`–`ai_x_yr2024` |
-| `09_wages_ai_panel_qa.csv` | QA summary for sample size and coverage (restricted) |
-| `02`–`05`, `07` | HILDA structure/diagnostic tables (restricted) |
