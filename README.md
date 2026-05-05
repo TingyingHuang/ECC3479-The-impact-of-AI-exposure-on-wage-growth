@@ -28,7 +28,7 @@ where `AI_i` is each individual's **2020 baseline occupation AI exposure score**
 - **Individual FE.** Absorbs all time-invariant personal characteristics; identification comes from within-person wage changes differentiated by AI exposure level.
 - **Base year 2020.** Coefficients β_t measure wage growth divergence relative to 2020.
 
-**Main finding:** After fixing baseline AI exposure and controlling for individual FE, workers in high-AI-exposure occupations in 2020 experienced significantly *lower* wage growth in 2021–2024 (β ranging from −0.090 to −0.205), consistent with post-COVID mean reversion of an elevated pandemic-era tech wage premium. A robustness check using time-varying AI exposure (see `output/econometric_twfe_robustness_timevarying.ipynb`) finds a positive 2021 effect (+0.083), attributable to endogenous occupational switching into high-AI roles.
+**Main finding:** After fixing baseline AI exposure and controlling for individual FE, workers in high-AI-exposure occupations in 2020 experienced significantly *lower* wage growth in 2021–2024 (β ranging from −0.090 to −0.205), consistent with post-COVID mean reversion of an elevated pandemic-era tech wage premium. A robustness check using time-varying AI exposure (see `output/robustness_timevarying.ipynb`) finds a positive 2021 effect (+0.083), attributable to endogenous occupational switching into high-AI roles.
 
 ## 1. Repository Structure
 
@@ -39,11 +39,8 @@ ecc3479-project/
 │   ├── raw/                                           ← raw input data files
 │   └── clean/                                         ← cleaned outputs used for analysis
 ├── output/
-│   ├── primary_analysis.ipynb                         ← PRIMARY ANALYSIS FILE (run this)
-│   ├── econometric_twfe_robustness_timevarying.ipynb  ← robustness check (time-varying AI)
-│   ├── table1_regression_results.csv                  ← formatted regression table (generated)
-│   ├── figure1_twfe_eventstudy.png                    ← event-study plot (generated)
-│   └── figure2_pretrend_check.png                     ← pre-trend check plot (generated)
+│   ├── primary_analysis.ipynb        ← PRIMARY ANALYSIS (run this first)
+│   └── robustness_timevarying.ipynb  ← robustness check: time-varying AI exposure
 ├── requirements.txt                                   ← Python packages
 └── README.md                                          ← this file
 ```
@@ -150,15 +147,12 @@ The notebook reads these clean data files:
 - `data/clean/06_hilda_person_wave_panel.csv` — full HILDA panel 2001–2024 (pre-trend check, §5)
 - `data/clean/01_aioe_by_anzsco.csv` — occupation-level AI exposure (pre-trend check, §5)
 
-And writes:
-- `output/table1_regression_results.csv` — formatted regression table
-- `output/figure1_twfe_eventstudy.png` — event-study plot
-- `output/figure2_pretrend_check.png` — pre-trend check plot
+All results (tables and figures) are rendered inline within the notebook.
 
 **Step 3 — Optional robustness notebook:**
 
 ```bash
-jupyter nbconvert --to notebook --execute output/econometric_twfe_robustness_timevarying.ipynb --inplace
+jupyter nbconvert --to notebook --execute output/robustness_timevarying.ipynb --inplace
 ```
 
 This runs the time-varying AI exposure specification (reads `data/clean/08_wages_ai_analysis_panel.csv`) and explains why it diverges from the primary result.
