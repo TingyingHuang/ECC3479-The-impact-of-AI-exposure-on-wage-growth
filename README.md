@@ -39,7 +39,7 @@ Read the analysis notebooks in this order:
    - §6 Main findings summary
 
 2. [`output/robustness_checks.ipynb`](output/robustness_checks.ipynb) — Comprehensive robustness suite (10 sections):
-   - Opens with a TOC and ** Summary Robustness Table** (all 9 specifications side by side) as a quick reference
+   - Opens with a TOC and **Summary Robustness Table** (all 9 specifications side by side) as a quick reference
    - §1 Pre-trend check (parallel trends, 2001–2019 cross-sectional slopes)
    - §2 Time-varying AI exposure (endogenous-switching test and sign-reversal explanation; Figure 2 comparison plot)
    - §3 Standard error choices (Classical / HC3 / Clustered)
