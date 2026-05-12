@@ -30,9 +30,25 @@ where `AI_i` is each individual's **2020 baseline occupation AI exposure score**
 
 Read the analysis notebooks in this order:
 
-1. [`output/primary_analysis.ipynb`](output/primary_analysis.ipynb) — Main TWFE results: identification strategy, regression table, event-study plot, and key threats
-2. [`output/robustness_timevarying.ipynb`](output/robustness_timevarying.ipynb) — TWFE with time-varying AI exposure (Column 2 of Table 1); explains the sign reversal between Column 1 and Column 2
-3. [`output/robustness_checks.ipynb`](output/robustness_checks.ipynb) — Comprehensive robustness suite: SE choices, alternative controls, sample restrictions, functional form, and placebo tests
+1. [`output/primary_analysis.ipynb`](output/primary_analysis.ipynb) — Main TWFE results:
+   - §1 Setup and data loading
+   - §2 Econometric specification (functional form, prep functions, model estimation, summary statistics)
+   - §3 Regression table and event-study plot (Figure 1)
+   - §4 Interpretation of main coefficients
+   - §5 Threats to identification
+   - §6 Main findings summary
+
+2. [`output/robustness_checks.ipynb`](output/robustness_checks.ipynb) — Comprehensive robustness suite (10 sections):
+   - Opens with a TOC and **§8 Summary Robustness Table** (all 9 specifications side by side) as a quick reference
+   - §1 Pre-trend check (parallel trends, 2001–2019 cross-sectional slopes)
+   - §2 Time-varying AI exposure (endogenous-switching test and sign-reversal explanation; Figure 2 comparison plot)
+   - §3 Standard error choices (Classical / HC3 / Clustered)
+   - §4 Alternative control sets (minimal / main / + state dummies)
+   - §5 Alternative samples (trimmed wages / non-switchers / prime-age 25–55)
+   - §6 Alternative functional form (log wage / IHS wage / levels)
+   - §7 Placebo tests and alternative base year
+   - §9 Coefficient plot (forest plot of 2023 coefficient across all specs)
+   - §10 Conclusions
 
 ---
 
@@ -45,9 +61,8 @@ ecc3479-project/
 │   ├── raw/                                           ← raw input data files
 │   └── clean/                                         ← cleaned outputs used for analysis
 ├── output/
-│   ├── primary_analysis.ipynb         ← PRIMARY ANALYSIS — main TWFE results, declaration, threats
-│   ├── robustness_timevarying.ipynb   ← Time-varying AI exposure (Column 2 of Table 1)
-│   └── robustness_checks.ipynb        ← Comprehensive robustness suite
+│   ├── primary_analysis.ipynb         ← PRIMARY ANALYSIS — specification, regression table, event-study plot, threats (§1–§6)
+│   └── robustness_checks.ipynb        ← Robustness suite: summary table at top (§8), pre-trend (§1), time-varying (§2), SE/controls/samples/form/placebo (§3–§7), forest plot (§9), conclusions (§10)
 ├── requirements.txt                                   ← Python packages
 └── README.md                                          ← this file
 ```
@@ -140,33 +155,23 @@ python code/06_build_hilda_ai_analysis_panel.py
 
 ---
 
-**Step 2 — Primary analysis** (main TWFE results, tables, figures):
+**Step 2 — Primary analysis** (TWFE model, regression table, event-study plot, §1–§6):
 
 ```bash
 jupyter nbconvert --to notebook --execute output/primary_analysis.ipynb --inplace
-```
-
-Reads: `data/clean/08_wages_ai_analysis_panel.csv`, `data/clean/06_hilda_person_wave_panel.csv`, `data/clean/01_aioe_by_anzsco.csv`
-
----
-
-**Step 3 — Time-varying AI exposure** (Column 2 of Table 1):
-
-```bash
-jupyter nbconvert --to notebook --execute output/robustness_timevarying.ipynb --inplace
 ```
 
 Reads: `data/clean/08_wages_ai_analysis_panel.csv`
 
 ---
 
-**Step 4 — Comprehensive robustness suite** (optional):
+**Step 3 — Robustness suite** (summary table, pre-trend, time-varying, SE/controls/samples/form/placebo, forest plot, §1–§10):
 
 ```bash
 jupyter nbconvert --to notebook --execute output/robustness_checks.ipynb --inplace
 ```
 
-Tests: SE formula choices, alternative control sets, alternative samples, functional form, placebo tests.
+Reads: `data/clean/08_wages_ai_analysis_panel.csv`, `data/clean/06_hilda_person_wave_panel.csv`, `data/clean/01_aioe_by_anzsco.csv`
 
 ---
 
