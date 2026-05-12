@@ -26,7 +26,17 @@ where `AI_i` is each individual's **2020 baseline occupation AI exposure score**
 - **Individual FE.** Absorbs all time-invariant personal characteristics; identification comes from within-person wage changes differentiated by AI exposure level.
 - **Base year 2020.** Coefficients β_t measure wage growth divergence relative to 2020.
 
-## 1. Repository Structure
+## 1. Reading Order
+
+Read the analysis notebooks in this order:
+
+1. [`output/primary_analysis.ipynb`](output/primary_analysis.ipynb) — Main TWFE results: identification strategy, regression table, event-study plot, and key threats
+2. [`output/robustness_timevarying.ipynb`](output/robustness_timevarying.ipynb) — TWFE with time-varying AI exposure (Column 2 of Table 1); explains the sign reversal between Column 1 and Column 2
+3. [`output/robustness_checks.ipynb`](output/robustness_checks.ipynb) — Comprehensive robustness suite: SE choices, alternative controls, sample restrictions, functional form, and placebo tests
+
+---
+
+## 2. Repository Structure
 
 ```text
 ecc3479-project/
@@ -42,7 +52,7 @@ ecc3479-project/
 └── README.md                                          ← this file
 ```
 
-## 2. Software Information
+## 3. Software Information
 
 - Python: 3.10+
 - Main packages: pandas, numpy, matplotlib, statsmodels, openpyxl, xlrd, jupyter, nbconvert
@@ -65,7 +75,7 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-## 3. Raw Data Requirements (`data/raw/`)
+## 4. Raw Data Requirements (`data/raw/`)
 
 ### Public/Shareable raw files (expected in `data/raw/`)
 - `01_aioe_raw.xlsx`
@@ -88,7 +98,7 @@ How to obtain HILDA:
 | Zip file 3 of 4 — Rperson Data Files | `data/raw/hilda_raw_rperson/` |
 | Zip file 4 of 4 — Eperson and Other Data Files | `data/raw/hilda_raw_eperson/` |
 
-## 4. Clean Data Outputs (`data/clean/`)
+## 5. Clean Data Outputs (`data/clean/`)
 
 Variable definitions: `data/clean/00_data_codebook.md`
 
@@ -100,7 +110,7 @@ Variable definitions: `data/clean/00_data_codebook.md`
 | `09_wages_ai_panel_qa.csv` | QA summary for sample size and coverage (restricted) |
 | `02`–`05`, `07` | HILDA structure/diagnostic tables (restricted) |
 
-## 5. How To Run The Project From Scratch
+## 6. How To Run The Project From Scratch
 
 Run all commands from the repository root.
 
