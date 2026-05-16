@@ -2,11 +2,11 @@
 
 ## Research Question
 
-How does occupational AI exposure affect wages across all occupations in Australia over the period 2020–2024, and how has that effect changed year by year?
+How is occupational AI exposure associated with wage growth across all occupations in Australia over the period 2020–2024, and how has that association changed year by year?
 
 ## Empirical Strategy
 
-This project estimates the causal effect of occupational AI exposure on individual wage growth using a **two-way fixed effects (TWFE) event-study model** with a continuous treatment intensity.
+This project documents the conditional association between occupational AI exposure and individual wage growth using a **two-way fixed effects (TWFE) event-study model** with a continuous treatment variable.
 
 **Primary specification:**
 
@@ -35,7 +35,7 @@ Read the analysis notebooks in this order:
    - §2 Econometric specification (functional form, prep functions, model estimation, summary statistics)
    - §3 Regression table and event-study plot (Figure 1)
    - §4 Interpretation of main coefficients
-   - §5 Threats to identification
+   - §5 Limitations and Alternative Explanations
    - §6 Main findings summary
 
 2. [`output/robustness_checks.ipynb`](output/robustness_checks.ipynb) — Comprehensive robustness suite (10 sections):
@@ -46,7 +46,7 @@ Read the analysis notebooks in this order:
    - §4 Alternative control sets (minimal / main / + state dummies)
    - §5 Alternative samples (trimmed wages / non-switchers / prime-age 25–55)
    - §6 Alternative functional form (log wage / IHS wage / levels)
-   - §7 Placebo tests and alternative base year
+   - §7 Placebo test and alternative base year
    - §9 Coefficient plot (forest plot of 2023 coefficient across all specs)
    - §10 Conclusions
 
